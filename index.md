@@ -224,10 +224,10 @@ s'appelle `ar` et s'utilise ainsi
 	ar rcs libmylib.a *.o
 
 Pour créer un objet `.so` sous Unix, il faut tout d'abord compiler les
-fichiers sources avec l'option `-fPic`, et ensuite créer la
-bibliothèque avec `-shared`.
+fichiers sources avec l'option `-fpic` (ou `-fPic`), et ensuite créer
+la bibliothèque avec `-shared`.
 
-	gcc -fPic -c *.c
+	gcc -fpic -c *.c
 	gcc -shared -o libmylib.so *.o
 
 Dans un cas comme dans l'autre, un exécutable peut linker la
@@ -387,7 +387,7 @@ Par exemple, pour le type `mpz_t`, on fera
 	mpz_init(x);
 	mpz_set_str(x, "12345", 10);  # met 12345 (lu en base 10) dans x
 	mpz_mul(x, x, x);
-	gmp_printf("%Z\n", x);
+	gmp_printf("%Zd\n", x);
 	mpz_clear(x);
 
 Les fonctions sur les entiers sont documentées ici :
@@ -415,7 +415,7 @@ Nous allons commencer par installer GMP, *from scratch*.
 	Cependant, vous n'avez pas les droits de super-utilisateur sur
     bourbaki, du coup vous ne pourrez pas faire `make install`. Pour
     contourner ce problème, nous allons installer GMP dans notre
-    espace d'utilisateur : passez l'option `--prefix=~` à
+    espace d'utilisateur : passez l'option `--prefix=$HOME` à
     `./configure`, ensuite procédez comme décrit dans le fichier
     `INSTALL`. Faites pareil même si vous travaillez sur votre propre
     machine : on fera plus simple par la suite.
