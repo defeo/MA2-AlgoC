@@ -1,5 +1,5 @@
-baseurl: /class-boilerplate
-github_base: https://github.com/defeo/class-boilerplate/blob/gh-pages
+baseurl: /MA2-AlgoC
+github_base: https://github.com/defeo/MA2-AlgoC/blob/gh-pages
 permalink: /:categories/:title
 
 markdown: kramdown

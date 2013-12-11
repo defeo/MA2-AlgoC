@@ -1,4 +1,4 @@
-Class Boilerplate
-=================
+# Algorithmique et programmation C
 
-Boilerplate Jekyll code for class material.
+Notes de cours pour le cours *Algorithmique et programmation C* du
+*Master d'algèbre appliquée*, par [Luca De Feo](http://defeo.lu).
