@@ -236,10 +236,10 @@ bibliothèque `libmylib.a` ou `libmylib.so` grâce à l'option `-l`
 	gcc -o hello hello.o -lmylib
 
 
-**Note :** La création de bibliothèques dynamiques compatibles avec différents
-systèmes d'exploitation est une opération complexe, pour laquelle il
-existe de nombreux outils qui visent à simplifier et automatiser la
-tâche ; un sur tous : *libtool*.
+**Note :** La création de bibliothèques dynamiques compatibles avec
+différents systèmes d'exploitation est une opération complexe, pour
+laquelle il existe de nombreux outils qui visent à simplifier et
+automatiser la tâche, le plus populaire étant *libtool*.
 
 **Note :** On oublie souvent qu'une bibliothèque C est constituée de
 *deux* composants : un code objet, contenu dans un fichier `.a` (ou
