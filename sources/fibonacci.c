@@ -1,9 +1,9 @@
 #include <gmp.h>
-#include <stdio.h>
+#include <stdlib.h>
 
-void fibonacci(mpz_t res, const mpz_t n) {
+void fibonacci(mpz_t res, long n) {
   /*
-    On intialize le résultat à M^0, i.e
+    On intialize le résultat à M⁰, i.e
       |0 1|⁰
       |1 1|  
     (i.e., l'identité)
@@ -16,8 +16,9 @@ void fibonacci(mpz_t res, const mpz_t n) {
   mpz_init(tmp1); mpz_init(tmp2);
 
   // On calcule M^n par un square and multiply de gauche à droite
-  size_t i;
-  for (i = mpz_sizeinbase(n, 2); i >= 1 ; i--) {
+  long i;
+  for (i = 1 ; i < n ; i <<= 1);
+  for ( ; i >= 1 ; i >>= 1) {
     /*
       Square (générique) :
       |a₀₀ a₀₁|² = |a₀₀²+a₀₁a₁₀  a₀₁(a₀₀+a₁₁)|
@@ -31,8 +32,7 @@ void fibonacci(mpz_t res, const mpz_t n) {
     mpz_add(a00, tmp1, tmp2);
     mpz_mul(tmp1, a11, a11);
     mpz_add(a11, tmp1, tmp2);
-    gmp_printf("%Zd %Zd\n%Zd %Zd\n\n", a00, a01, a10, a11);
-    if (mpz_tstbit(n, i-1)) {
+    if (n & i) {
       /*
 	Multiply (spécifique à M) :
 	|a₀₀ a₀₁| |0 1| = |a₀₁  a₀₀+a₀₁|
@@ -42,9 +42,7 @@ void fibonacci(mpz_t res, const mpz_t n) {
       mpz_add(a11, a10, a11);
       mpz_sub(a00, a01, a00);
       mpz_sub(a10, a11, a10);
-      gmp_printf("%Zd %Zd\n%Zd %Zd\n\n", a00, a01, a10, a11);
     }
-    printf("\n");
   }
   // f(n) apparaît sur la diagonale de M
   mpz_set(res, a01);
@@ -52,11 +50,11 @@ void fibonacci(mpz_t res, const mpz_t n) {
 
 void main(int argc, char** argv) {
   if (argc > 1) {
-    mpz_t n, f;
-    mpz_init(n); mpz_init(f);
-    mpz_set_str(n, argv[1], 10);
+    long n = atol(argv[1]);
+    mpz_t f;
+    mpz_init(f);
     fibonacci(f, n);
     gmp_printf("%Zd\n", f);
-    mpz_clear(n); mpz_clear(f);
+    mpz_clear(f);
   }
 }

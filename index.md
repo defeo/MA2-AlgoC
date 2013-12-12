@@ -434,6 +434,15 @@ Nous allons commencer par installer GMP, *from scratch*.
     $$n$$-ième nombre de Fibonacci. Le programme doit utiliser
     seulement $$O(\log n)$$ additions et multiplications.
 
+    Vous trouverez ici une
+	[soultion]({{site.github_base}}/sources/fibonacci.c). Elle
+	pourrait être améliorée, mais ses performances ne sont pas tout à
+	fait ridicules (par comparaison, la fonction `fibo` de Pari/gp est
+	environ six fois plus rapide). On a choisi d'utiliser le format
+	`long` pour le paramètre $$n$$, en effet les tests montrent qu'il
+	est possible de calculer $$f_n$$ en quelques secondes pour
+	$$n\sim2^{25}$$.
+
 Pour taper des commandes plus courtes, dans la suite nous allons
 utiliser la version de GMP installée par défaut par le système. Elle
 est déjà présente sur bourbaki, il suffit d'ajouter `-lgmp` à la phase
