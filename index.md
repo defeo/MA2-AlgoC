@@ -232,9 +232,19 @@ la bibliothèque avec `-shared`.
 
 Dans un cas comme dans l'autre, un exécutable peut linker la
 bibliothèque `libmylib.a` ou `libmylib.so` grâce à l'option `-l`
+(attention, l'ordre des options est important !)
 
 	gcc -o hello hello.o -lmylib
 
+**Note :** Si la bibliothèque a été crée dans le dossier courant, il
+faudra très probablement ajouter l'option `-L` pour indiquer au
+compilateur où trouver le fichier :
+
+	gcc -o hello hello.o -L. -lmylib
+
+En plus, si la bibliothèque est dynamique, il faudra aussi instruire
+le *linker* de système, à travers la variable `LD_LIBRARY_PATH`. Voir
+la section suivante.
 
 **Note :** La création de bibliothèques dynamiques compatibles avec
 différents systèmes d'exploitation est une opération complexe, pour
@@ -459,7 +469,7 @@ facteurs.
 Les algorithmes présentés ci-dessous sont basés sur le théorème des
 restes chinois qui donne une décomposition
 
-$$ℤ/Nℤ ≃ \bigoplus_{q \vert N, q \text{ premier}} ℤ/qℤ.$$
+$$ℤ/Nℤ ≃ \bigoplus_{\substack{q \vert N\\q \text{ premier}}} ℤ/qℤ.$$
 
 ### Rho de Pollard
 
@@ -484,13 +494,13 @@ que $$p-1$$ n'a que des petits facteurs.
 On suppose que tous les facteurs de $$p-1$$ sont plus petits d'une
 borne $$B$$ et on calcule
 
-$$x = \prod_{q \text{ prime } < B} q.$$
+$$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
 
 Alors $$(p-1) \vert x$$ et $$a^x ≡ 1 \bmod p$$. Comme auparavant,
 $$p\vert\gcd(a^x - 1, N)$$, et si ce pgcd est différent de $$N$$ nous
 avons une factorisation.
 
-On interpréter la méthode $$p-1$$ comme une façon d'exploiter la
+On peut interpréter la méthode $$p-1$$ comme une façon d'exploiter la
 structure de groupe algébrique de $$(ℤ/Nℤ)^*$$. C'est cette
 interprétation qui donne lieu à des généralisation intéressantes.
 
@@ -512,8 +522,8 @@ factorisation.
 
 Si par contre $$\Delta$$ est un non-résidu quadratique, alors
 $$\mathcal{C}$$ a $$p+1$$ points rationnels, et on peut montrer
-qu'elle est isomorphe au sous-groupe de $$𝔽_{p^2}$$ des éléments de
-norme 1.
+qu'elle est isomorphe au sous-groupe multiplicatif des éléments de
+norme 1 de $$𝔽_{p^2}$$.
 
 La loi de groupe sur $$\mathcal{C}$$ induite par l'isomorphisme a une
 description géométrique simple. Son élément neutre a coordonnées
@@ -522,32 +532,34 @@ simples :
 
 $$P\oplus Q = \left(\frac{x_Px_Q + \Delta y_Py_Q}{2},\; \frac{x_Py_Q + x_Qy_P}{2}\right).$$
 
+**Note :** Cette loi de groupe, sous le nom de
+[méthode du *Chakravala*](http://en.wikipedia.org/wiki/Chakravala_method),
+était déjà connue aux mathématiciens indiens du X siècle, qui
+l'utilisaient pour la résolution d'équations quadratiques, dont
+l'équation de Pell.
+
 Par induction, on peut montrer que si $$α_1$$ est l'abscisse du point
 $$P$$, alors l'abscisse $$α_n$$ de $$[n]P$$ est définie par la *suite
 de Lucas*
 
 $$α_{n+1} = α_1α_n - α_{n-1}.$$
 
-Remarquez que cette formule ne dépend pas de $$Δ$$, en effet
-$$\frac{p+1}{2}$$ abscisses définissent des points appartenant à la
-conique de Pell avec $$\bigl(\frac{Δ}{p}\bigr)=-1$$, les autres
-$$\frac{p-1}{2}$$ abscisses définissent des points appartenant avec
-$$\bigl(\frac{Δ}{p}\bigr)=1$$.
-
-C'est maintenant un exercice facile de déduire un algorithme de type
-*square and multiply* pour calculer $$\alpha_m$$.
+Remarquez que cette formule ne dépend pas de $$Δ$$.  C'est maintenant
+un exercice facile de déduire un algorithme de type *square and
+multiply* pour calculer $$\alpha_m$$.
 
 La méthode $$p+1$$ s'ensuit en considérant une conique de Pell à
 coefficients dans $$ℤ/Nℤ$$. On suppose que tous les facteurs de
-$$p+1$$ sont plus petits d'une borne $$B$$ et on calcule $x$ comme
+$$p+1$$ sont plus petits d'une borne $$B$$ et on calcule $$x$$ comme
 auparavant :
 
-$$x = \prod_{q \text{ prime } < B} q.$$
+$$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
 
-On choisit un point $$P$$ au hasard, en espérant que cela définisse
-une conique avec $$\bigl(\frac{Δ}{p}\bigr)=-1$$. On calcule l'abscisse
-de $$[x]P$$, elle est nécessairement congrue à $$2$$ modulo $$p$$, par
-conséquent $$p\vert\gcd(\alpha_x-2,N)$$.
+On choisit un point $$P$$ au hasard, en espérant qu'il s'agisse d'un
+point sur une conique avec $$\bigl(\frac{Δ}{p}\bigr)=-1$$ (cela a une
+environ chance sur deux d'arriver). On calcule l'abscisse de $$[x]P$$,
+elle est nécessairement congrue à $$2$$ modulo $$p$$, par conséquent
+$$p\vert\gcd(\alpha_x-2,N)$$.
 
 Pour plus de détails voir le chapitre 10 des notes de cours de Franz
 Lemmermeyer : <http://www.fen.bilkent.edu.tr/~franz/crypto/cryp06.pdf>
