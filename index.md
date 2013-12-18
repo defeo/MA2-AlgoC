@@ -576,13 +576,60 @@ Lemmermeyer : <http://www.fen.bilkent.edu.tr/~franz/crypto/cryp06.pdf>
 
 ## Logarithme discret
 
+On s'intéresse au calcul du logarithme discret dans le groupe
+multiplicatif de $$𝔽_p$$ ; on rappelle que ce groupe est cyclique. Les
+algorithmes qu'on va présenter, à l'exception du calcul d'index, sont
+des algorithmes génériques, applicables à tout groupe.
+
+Dans la suite on suppose donné un générateur $$g$$ du groupe
+multiplicatif, et on veut calculer $$\log_gh$$ pour un $$h$$ donné.
+
 ### Pohlig-Hellman
 
-### Baby-step giant-step
+Il s'agit d'utiliser le theorème des restes chinois pour réduire le
+logarithme discret de $$𝔽_p^*$$ au logarithme discret dans ses
+sous-groupes d'ordre premier. Il demande la connaissance de la
+factorisation de $$p-1$$.
 
-### Pollard Rho
+### Baby step – giant step
+
+Le principe de cet algorithme est de trouver une *collision* entre
+deux puissances de $$g$$. En effet, si l'on arrive à trouver une
+égalité du type
+
+$$g^a = g^bh$$
+
+on déduit immédiatement que $$\log_gh = a-b \bmod (p-1)$$.
+
+L'algorithme commence par fixer un paramètre $$m~\sqrt{p}$$. Ensuite
+il se décompose en deux phases :
+
+* On tabule les éléments $$g^0, \dots g^{m-1}$$,
+* On calcule $$g^{mi}h$$ pour tout $$i ∈ [0,\dots,(p-1)/m]$$ jusqu'à
+  trouver une collision.
+
+Pour que la recherche de collisions soit efficace, il est important
+que la recherche dans la table calculée au premier pas soit
+rapide. Pour cela, on emploie une *table de hashage*, ce qui garantit
+une complexité de $$O(\sqrt{p})$$.
+
+### Pollard rho
+
+Cet algorithme est l'analogue probabiliste de *baby step – giant
+step*, son analyse de complexité se base sur le paradoxe des
+anniversaires.
+
+On cherche cette fois-ci des collisions de la forme
+
+$$g^ah^b = g^ch^d$$
+
+ce qui donne $$\log_gh = (a-c)/(d-b) \bmod (p-1)$$. Pour trouver les
+collisions, on procède comme dans Pollard rho pour la factorisation.
 
 ### Calcul d'index
+
+Cet algorithme combine les idées de *baby step – giant step* avec de
+l'algèbre linéaire.
 
 ### Exercices
 
@@ -591,12 +638,295 @@ Lemmermeyer : <http://www.fen.bilkent.edu.tr/~franz/crypto/cryp06.pdf>
 
 	199214358783833785496649131630759414803916321139456200129431155042143170897974614023327.
 
+## Le *profiler*
+
+La commande `time` est une façon simple de évaluer et comparer les
+performances de vos programmes. Mais, lorsqu'il s'agit d'optimiser
+votre code, cela peut ne plus être suffisant.
+
+Le *profiling* est une technique qui consiste à instrumenter le code
+au moment de la compilation avec des instructions supplémentaires
+permettant de mesurer les performances. Il existe divers types de
+*profiler* : ceux qui mesurent le nombre d'appels aux fonctions et
+leur durée (`prof`, `gprof`, ...), ceux qui mesurent les accès à la
+mémoire et aux caches (`valgrind`, `cachegrind`, ...) et bien d'autres.
+
+Nous nous intéressons ici seulement à `gprof`, dont on peut trouver la
+documentation à l'adresse
+<http://www.cs.utah.edu/dept/old/texinfo/as/gprof_toc.html>. Pour
+compiler un programme avec du support pour le *profiling*, il faut
+ajouter l'option `-pg` à la compilation et aussi au linkage :
+
+	gcc -pg -c prog.c
+	gcc -pg prog.o -lm
+
+Lorsque l'on exécute un programme compilé ainsi, un fichier `gmon.out`
+est généré à la sortie du programme. Ce fichier n'est pas dans un
+format lisible par un humain, il est transformé par le programme
+`gprof` :
+
+	gprof a.out gmon.out > profile.txt
+
+Après cette commande, le fichier `profile.txt` contient deux parties :
+le *profil plat* et le *graphe d'appel*. Le profil plat (*flat
+profile*) est une liste de toutes les fonctions appelées, ordonnées
+par temps d'exécution décroissant. Ses colonnes contiennent le
+pourcentage de temps que le programme a passé dans la fonction, la
+même information en secondes (*cumulative seconds*), combien de
+secondes le programme a passé dans la fonction sans compter les appels
+à d'autres sous-routines (*self seconds*), le nombre total d'appels et
+la durée moyenne par appel. Voici un exemple de profil plat
+
+	Flat profile:
+
+	Each sample counts as 0.01 seconds.
+	%   cumulative   self              self     total           
+	time   seconds   seconds    calls  ms/call  ms/call  name    
+	33.34      0.02     0.02     7208     0.00     0.00  open
+	16.67      0.03     0.01      244     0.04     0.12  offtime
+	16.67      0.04     0.01        8     1.25     1.25  memccpy
+	16.67      0.05     0.01        7     1.43     1.43  write
+	16.67      0.06     0.01                             mcount
+	 0.00      0.06     0.00      236     0.00     0.00  tzset
+	 0.00      0.06     0.00      192     0.00     0.00  tolower
+	 0.00      0.06     0.00       47     0.00     0.00  strlen
+	 0.00      0.06     0.00       45     0.00     0.00  strchr
+	 0.00      0.06     0.00        1     0.00    50.00  main
+	 0.00      0.06     0.00        1     0.00     0.00  memcpy
+	 0.00      0.06     0.00        1     0.00    10.11  print
+	 0.00      0.06     0.00        1     0.00     0.00  profil
+	 0.00      0.06     0.00        1     0.00    50.00  report
+
+Le graphe d'appel (*call graph*) contient pour chaque fonction la
+liste de toutes les sous-fonctions appelées par celle-ci, le temps
+passé dans chaque fonction, le nombre d'appels etc. Il se termine par
+un index de toutes les fonctions dans le graphe, pour aider la
+recherche d'un nœud particulier.
+
+Voici un exemple de nœud pour la fonction `fibonacci`. On voit qu'elle
+a été appelée une fois (sur une fois au total) par `main`, et qu'elle
+a fait tous les 125 appels à `__gmpz_mul`, les 99 appels à
+`__gmpz_add`, etc., mais seulement 2 des 3 appels à `__gmpz_init`. Les
+numéros entre crochets sont des références numériques pour les nœuds
+du graphe.
+
+	-----------------------------------------------
+					0.00    0.00       1/1           main [4]
+	[41]     0.1    0.00    0.00       1         fibonacci [41]
+					0.00    0.00     125/125         __gmpz_mul [42]
+					0.00    0.00      99/99          __gmpz_add [435]
+					0.00    0.00      24/24          __gmpz_sub [443]
+					0.00    0.00       4/4           __gmpz_init_set_ui [448]
+					0.00    0.00       2/3           __gmpz_init [449]
+					0.00    0.00       1/1           __gmpz_set [453]
+	-----------------------------------------------
+
+Il existe un programme permettant de transformer ce format textuel en
+une visualisation graphique, il s'agit de
+[Gprof2Dot](http://code.google.com/p/jrfonseca/wiki/Gprof2Dot).
+
+
+### Profiler GMP
+
+Le profiler se limite a rapporter le temps passé dans les fonctions
+qui ont été compilées avec l'option `-pg`. Le temps passé dans toute
+autre fonction est tout simplement ignoré. Ainsi, si votre programme
+passe la majorité de son temps à faire des appels à GMP, son profil
+vous donnera bien peu d'information.
+
+Pour obtenir un profil incluant les appels à des fonctions dans des
+bibliothèques externes, il faut compiler ces derniers avec le support
+pour le *profiling*. Ceci n'est pas suffisant : `gprof` ne sait
+générer des profils que pour des fonctions *linkées* statiquement.
+
+Pour compiler GMP avec le support pour le profiling, il faut passer
+une option au script de configuration, et ensuite recompiler la
+bibliothèque
+
+	./configure --prefix=$HOME --enable-profiling=gprof
+	make clean
+	make
+
+Ensuite, pour *linker* statiquement les bibliothèques au moment de la
+compilation, il faut passer l'option `-static` au *linker*. Il ne
+faudra pas oublier d'adresser la compilation et le *linkage* vers les
+bonnes versions de la bibliothèque à l'aide des options `-I` et `-L`
+(voir [plus haut](#les-chemins-de-recherche)).
+
+	gcc -I$HOME/include -L$HOME/lib  -pg -static prog.c -lgmp
+
+
+### Exercices
+
+1. Compilez le programme que vous avez écrit pour évaluer la suite de
+   Fibonacci (ou à défaut [celui du prof](sources/fibonacci.c)) avec
+   le support pour le *profiling*, générez des profils et
+   analysez-les. Que remarquez vous ?
+
+2. Compilez maintenant GMP avec le support pour le *profiling*,
+   *linkez* votre programme avec cette version de GMP, et générez à
+   nouveau les profils.
+
+
 ## Courbes Elliptiques
 
 ### Loi de groupe
 
+Équation de Weierstraß généralisée
+
+$$y^2 + a_1 xy + a_3 y = x^3 + a_2 x^2 + a_4 x + a_6$$
+
+Équation de Weierstraß en caractéristique $$≥ 5$$
+
+$$y^2 = x^3 + ax + b$$
+
+Loi de groupe, coordonnées affines
+
+* Inversion : $$[-1](x,y) = (x,-y)$$,
+
+* Addition : $$(x_1, y_1) ⊕ (x_2, y_2) = (x_3, y_3)$$ avec
+
+  $$\begin{align*}
+	  &\lambda = \begin{cases}
+        \frac{y_2 - y_1}{x_2 -x_1} &\text{si $P\ne Q$,}\\
+        \frac{3x_1^2+a}{2y_1} &\text{si $P=Q$,}
+      \end{cases}\\
+	  &x_3 = \lambda^2-x_1-x_2\\
+	  &y_3 = \lambda x_1 - \lambda x_3 - y_1
+  \end{align*}$$ 
+
+Loi de groupe, coordonnées projectives.
+
+
+### Forme d'Edwards
+
+L'équation de Weierstraß a l'avantage d'être simple à comprendre
+géométriquement, et d'avoir des liens profonds avec l'analyse
+complexe. Cependant, d'un point de vu algorithmique elle n'offre pas
+la représentation la plus efficace du groupe des points d'une courbe
+elliptique. Le site <http://www.hyperelliptic.org/EFD/> propose un
+bestiaire de *formes* de courbes elliptiques avec un comparatif des
+meilleures formules pour l'addition et le dédoublement. Nous nous
+intéressons ici à la *forme d'Edwards*.
+
+Forme d'Edwards, $$p ≠ 2, cd(1 − c^4d) ≠ 0$$.
+
+$$x^2 + y^2 = c^2(1+dx^2y^2)$$
+
+Loi de groupe, coordonnées affines
+
+* Inversion : $$[-1](x,y) = (-x,y)$$,
+
+* Addition : $$(x_1, y_1) ⊕ (x_2, y_2) = (x_3, y_3)$$ avec
+
+	$$
+		x_3 = \frac{x_1 y_2 + y_1 x_2}{c(1 + dx_1 x_2 y_1 y_2)},\quad
+		y_3 = \frac{y_1 y_2 - x_1 x_2}{c(1 - dx_1 x_2 y_1 y_2)}
+	$$
+
+Structure de groupe :
+
+* Le point $$(0, c)$$ est l'identité,
+* Le point $$(0, -c)$$ est d'ordre 2,
+* Les points $$(c, 0)$$ et $$(-c, 0)$$ sont d'ordre 4.
+
+La loi de groupe est
+
+* *Unifiée* (pas de cas spécial pour le dédoublement),
+* *Complète* (pas de cas spécial pour le point à l'infini).
+
+Coordonnées projectives. La formule donnée ici
+<http://www.hyperelliptic.org/EFD/g1p/auto-edwards-projective.html#addition-add-2007-bl>,
+est la meilleure formule pour l'addition générique de deux points sur
+une courbe d'Edwards. Elle utilise 10 multiplications, 1 élévation au
+carré, 2 multiplications par les constantes $$c$$ et $$d$$, et 7
+additions.
+
+
+### Forme de Montgomery et échelle de Montgomery
+
+Une *addition différentielle* est une formule permettant de calculer
+les coordonnées du point $$P⊕Q$$ à partir de celles des points
+$$P,Q,P\ominus Q$$. Pour la forme de Weierstraß il est possible
+d'obtenir une formule d'addition différentielle qui ne fait intervenir
+que les abscisses, et ceci peut être généralisé à pas mal d'autres
+formes.
+
+La forme ayant la meilleure addition différentielle est la *forme de
+Montgomery*.
+
+$$by^2=x^3+ax^2+x$$
+
+Le changement de variables
+
+$$u = \frac{x}{b}, \quad v = \frac{y}{b}$$
+
+ramène cette courbe à la forme de Weierstraß
+
+$$v^2 = u^3 + \frac{a}{b}u^2 + \frac{1}{b^2}u$$
+
+La loi de groupe en est déduite immédiatement.
+
+Addition différentielle, coordonnées projectives :
+$$(x_1:z_1) ⊕ (x_2:z_2) = (X:Z)$$ avec $$P\ominus Q = (x_3:z_3)$$
+
+$$X = z_1(x_2x_3 - z_2z_3)^2, \quad Z = x_1(x2z_3 - z_2x3)^2$$
+
+Dédoublement
+
+$$X = (x+z)^2(x-z)^2, \quad Z = 4xz\left((x-z)^2 + \frac{a+2}{4}(4xz)\right)$$
+
+L'utilisation de la seule abscisse confond les points $$P$$ et
+$$-P$$. Par conséquent, ces formules ne permettent pas d'additionner
+deux points quelconques, il n'est donc pas possible de les utiliser
+dans un algorithme de type *double-and-add*.
+
+Cependant il est encore possible de définir la multiplication
+scalaire, en effet $$[±k]P$$ ont la même abscisse. L'algorithme dit de
+*l'échelle de Montgomery* permet de calculer l'abscisse de $$[k]P$$ à
+partir de l'abscisse de $$P$$. Pendant tout l'algorithme, on garde en
+mémoire une paire de points $$A$$ et $$B$$, dont la différence est
+$$P$$, et on procède de façon similaire à un *double-and-add*.
+
+	A = 0
+	B = P
+	D = P
+	pour tout bit b de k en partant de la gauche
+		si b == 0
+			A = Double(A)
+			B = DiffAdd(A, B, P)
+		sinon
+			A = DiffAdd(A, B, P)
+			B = Double(B)
+	renvoyer A
+
+
 ### La méthode de factorisation ECM
 
+Il s'agit de la généralisation des méthodes $$p-1$$ et $$p+1$$, où aux
+groupes $$\mathbb{G}_m(𝔽_p),C(𝔽_p)$$ l'on substitue des courbes
+elliptiques tirées au hasard.
+
+
+### Excercices
+
+1. Implanter la loi de groupe d'une courbe elliptique en forme de
+   Weierstrasß simplifiée, en utilisant les coordonnées affines.
+
+2. Implanter la même loi en utilisant les coordonnées
+   projectives. Comparer les deux implantations à l'aide du
+   *profiler*.
+
+3. Implanter la loi de groupe d'une courbe en forme d'Edwards, en
+   coordonnées affines et projectives. Comparer avec le *profiler*.
+
+4. Implanter la loi de groupe par échelle de Montgomery, en
+   coordonnées affines et projectives. Comparer.
+
+5. Implanter ECM. Le tester sur les entiers suivants
+   
+   * 1393796574908163986240549427302845248438701
+   * 1532495540865888858358363506942984602634210860718886417
 
 ## Couplages
 

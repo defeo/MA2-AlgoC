@@ -1,5 +1,5 @@
 #include <gmp.h>
-#include <stdlib.h>
+#include <stdio.h>
 
 void fibonacci(mpz_t res, long n) {
   /*
@@ -49,6 +49,9 @@ void fibonacci(mpz_t res, long n) {
 }
 
 void main(int argc, char** argv) {
+  printf("GNU GMP %d.%d.%d, compiled with %s %s\n", __GNU_MP_VERSION,
+	 __GNU_MP_VERSION_MINOR, __GNU_MP_VERSION_PATCHLEVEL,
+	 __GMP_CC, __GMP_CFLAGS);
   if (argc > 1) {
     long n = atol(argv[1]);
     mpz_t f;
