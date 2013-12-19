@@ -445,7 +445,7 @@ Nous allons commencer par installer GMP, *from scratch*.
     seulement $$O(\log n)$$ additions et multiplications.
 
     Vous trouverez ici une
-	[soultion]({{site.github_base}}/sources/fibonacci.c). Elle
+	[solution]({{site.github_base}}/sources/fibonacci.c). Elle
 	pourrait être améliorée, mais ses performances ne sont pas tout à
 	fait ridicules (par comparaison, la fonction `fibo` de Pari/gp est
 	environ six fois plus rapide). On a choisi d'utiliser le format
@@ -569,9 +569,19 @@ Lemmermeyer : <http://www.fen.bilkent.edu.tr/~franz/crypto/cryp06.pdf>
 1. Implanter ces trois méthodes de factorisation et comparer leur
    performances, notamment sur les entiers
 
-	* 2177241218019392284455749961185783753335013327591,
+	* 1267650600228402790082356974917,
+	* 2177241218019392284455749961185783753335013327591 (une bonne
+      implantation de Pollard rho devrait prendre une dizaine de
+      minutes),
 	* 199214358783833785496649131630759414803916321139456200129431155042143170897974614023327,
 	* 6500836418678143176619908800773996927084289993776850414594757469264912497841920022968113.
+	
+	Voici la
+    [solution]({{site.github_base}}/sources/factor.c). Remarquez que
+    l'implantation des méthodes $$p-1$$ et $$p+1$$ ne correspond pas
+    exactement à l'exposition donnée plus haut : l'exposant $$e$$ est
+    égal ici à $$B!$$. Cela donne un algorithme similaire, avec des
+    probabilités de succès légèrement différentes.
 
 
 ## Logarithme discret
