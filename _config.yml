@@ -1,5 +1,7 @@
 baseurl: /MA2-AlgoC
-github_base: https://github.com/defeo/MA2-AlgoC/blob/gh-pages
+github: https://github.com/defeo
+github_base: https://github.com/defeo/MA2-AlgoC
+github_blob: https://github.com/defeo/MA2-AlgoC/blob/gh-pages
 permalink: /:categories/:title
 
 markdown: kramdown
