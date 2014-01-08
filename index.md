@@ -884,7 +884,7 @@ La loi de groupe en est déduite immédiatement.
 Addition différentielle, coordonnées projectives :
 $$(x_1:z_1) ⊕ (x_2:z_2) = (X:Z)$$ avec $$P\ominus Q = (x_3:z_3)$$
 
-$$X = z_1(x_2x_3 - z_2z_3)^2, \quad Z = x_1(x2z_3 - z_2x3)^2$$
+$$X = z_1(x_2x_3 - z_2z_3)^2, \quad Z = x_1(x_2z_3 - z_2x_3)^2$$
 
 Dédoublement
 
