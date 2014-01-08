@@ -5,3 +5,6 @@ github_blob: https://github.com/defeo/MA2-AlgoC/blob/gh-pages
 permalink: /:categories/:title
 
 markdown: kramdown
+
+kramdown:
+  toc_levels: 2..2

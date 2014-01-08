@@ -11,6 +11,10 @@ scripts: ["http://yandex.st/highlightjs/7.5/highlight.min.js",
 Notes de cours pour le cours *Algorithmique et programmation C* du
 *Master d'algèbre appliquée*, par [Luca De Feo](http://defeo.lu).
 
+1. TOC
+{:toc}
+
+
 ## Compilation séparée, bibliothèques logicielles
 
 ### Fichiers objets, *linkage*
@@ -937,14 +941,3 @@ elliptiques tirées au hasard.
    
    * 1393796574908163986240549427302845248438701
    * 1532495540865888858358363506942984602634210860718886417
-
-## Couplages
-
-### Diviseurs
-
-### Couplage de Weil
-
-### Couplage de Tate
-
-### Protocoles à base de couplages
-
