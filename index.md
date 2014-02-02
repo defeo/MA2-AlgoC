@@ -560,10 +560,10 @@ auparavant :
 $$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
 
 On choisit un point $$P$$ au hasard, en espérant qu'il s'agisse d'un
-point sur une conique avec $$\bigl(\frac{Δ}{p}\bigr)=-1$$ (cela a une
-environ chance sur deux d'arriver). On calcule l'abscisse de $$[x]P$$,
-elle est nécessairement congrue à $$2$$ modulo $$p$$, par conséquent
-$$p\vert\gcd(\alpha_x-2,N)$$.
+point sur une conique avec $$\bigl(\frac{Δ}{p}\bigr)=-1$$ (cela a
+environ une chance sur deux d'arriver). On calcule l'abscisse de
+$$[x]P$$, elle est nécessairement congrue à $$2$$ modulo $$p$$, par
+conséquent $$p\vert\gcd(\alpha_x-2,N)$$.
 
 Pour plus de détails voir le chapitre 10 des notes de cours de Franz
 Lemmermeyer : <http://www.fen.bilkent.edu.tr/~franz/crypto/cryp06.pdf>
@@ -941,3 +941,5 @@ elliptiques tirées au hasard.
    
    * 1393796574908163986240549427302845248438701
    * 1532495540865888858358363506942984602634210860718886417
+
+Voici une [solution](sources/ecm.c) de ces exercices.
