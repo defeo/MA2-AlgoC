@@ -942,4 +942,4 @@ elliptiques tirées au hasard.
    * 1393796574908163986240549427302845248438701
    * 1532495540865888858358363506942984602634210860718886417
 
-Voici une [solution](sources/ecm.c) de ces exercices.
+Voici une [solution]({{site.github_blob}}/sources/ecm.c) de ces exercices.
