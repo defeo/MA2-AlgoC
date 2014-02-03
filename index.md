@@ -1,9 +1,7 @@
 ---
 layout: index
 title: Algorithmique et programmation C
-styles: ["http://yandex.st/highlightjs/7.5/styles/default.min.css"]
-scripts: ["http://yandex.st/highlightjs/7.5/highlight.min.js",
-          "js/local.js"]
+plugins: ['mathjax', 'highlight']
 ---
 
 # Algorithmique et programmation C
