@@ -1,12 +1,19 @@
 /*
-  Ce code implante trois méthodes de factorisation : Pollard rho, p-1
-  et p+1.
- */
+  Ce code implante trois variantes de la méthode de factorisation
+  ECM. Chaque variante utilise un modèle de courbe différent :
+  Weierstrass, Edwards et Montgomery. Dans les trois cas, les points
+  sont représentés en coordonnées projectives.
+*/
 
 #include <gmp.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <assert.h>
+
+/* Des constantes pour désigner le modèle */
+#define WEIERSTRASS 'W'
+#define EDWARDS 'E'
+#define MONTGOMERY 'M'
 
 /* Un point représenté par ses coordonnées projectives */
 typedef struct {
@@ -42,11 +49,14 @@ typedef curve_struct curve_t[1];
 mpz_t tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8;
 
 
-/* Équivalent de mpz_init pour les points */
-void point_init(point_t P) {
+/* 
+   Comme mpz_init, initialise la mémoire.  En plus, il initialise les
+   coordonnées au point neutre du modèle.
+*/
+void point_init(point_t P, char model) {
   mpz_init(P->X);
   mpz_init_set_ui(P->Y, 1);
-  mpz_init(P->Z);
+  mpz_init_set_ui(P->Z, model == EDWARDS ? 1 : 0);
 }
 void point_copy(point_t P, const point_t Q) {
   mpz_set(P->X, Q->X);
@@ -54,8 +64,18 @@ void point_copy(point_t P, const point_t Q) {
   mpz_set(P->Z, Q->Z);
 }
 
+/********************* Weierstrass  ************************
 
-/* Formule d'addition de Weierstraß. */
+La courbe a equation
+
+  y² = x³ + ax + b
+
+Dans les algorithmes qui suivent, C->i est l'invariant a. La
+connaissance de b n'est pas nécessaire pour les formules.
+
+***********************************************************/
+
+/* Formule de doublement de Weierstraß. */
 void w_double(point_t res, const point_t P, const curve_t C) {
   mpz_mul_ui(tmp1, P->Y, 2);
   mpz_mul(tmp2, tmp1, P->Z);
@@ -204,47 +224,200 @@ void w_add(point_t res, const point_t P, const point_t Q, const curve_t C) {
   }
 }
 
-/* L'algorithme double and add gauche-droite classique */
-void double_and_add(point_t res, const point_t P, const mpz_t n, const curve_t C) {
+
+/************************* Edwards  ********************************
+
+La courbe a equation
+
+  x² + y² = 1 + dx²y²
+
+Dans les algorithmes qui suivent, C->i est l'invariant d.  Pour
+simplicité on utilise la formule unifiée pour les doublements et les
+additions.
+
+*******************************************************************/
+
+/* Formule d'addition (et doublement) d'Edwards. */
+void e_add(point_t res, const point_t P, const point_t Q, const curve_t C) {
+  /* 
+     Les formules projectives:
+
+       X₃ = (X₁Y₂ + Y₁X₂) ((Ζ₁Ζ₂)² - dX₁X₂Y₁Y₂) Z₁Z₂
+       Y₃ = (Y₁Y₂ - X₁X₂) ((Ζ₁Ζ₂)² + dX₁X₂Y₁Y₂) Z₁Z₂
+       Z₃ = (Ζ₁Ζ₂)⁴ - (dX₁X₂Y₁Y₂)²
+       
+     Voir aussi
+
+       <http://www.hyperelliptic.org/EFD/g1p/auto-edwards-projective.html#addition-add-2007-bl>
+  */
+  mpz_mul(tmp1, P->Z, Q->Z);
+  mpz_mod(tmp1, tmp1, C->p); // Z₁Z₂
+  mpz_mul(tmp2, tmp1, tmp1);
+  mpz_mod(tmp2, tmp2, C->p); // (Z₁Z₂)²
+  mpz_mul(tmp3, P->X, Q->X);
+  mpz_mod(tmp3, tmp3, C->p); // X₁X₂
+  mpz_mul(tmp4, P->Y, Q->Y);
+  mpz_mod(tmp4, tmp4, C->p); // Y₁Y₂
+  mpz_add(tmp5, P->X, P->Y);
+  mpz_add(tmp6, Q->X, Q->Y);
+  mpz_mul(tmp7, tmp5, tmp6);
+  mpz_mod(tmp5, tmp7, C->p); // (X₁ + Y₁) (X₂ + Y₂)
+  // À partir de maintenant, on ne touche plus à P et Q, 
+  // on peut alors toucher à res.
+  mpz_mul(tmp6, tmp3, tmp4);
+  mpz_mod(tmp6, tmp6, C->p);
+  mpz_mul(tmp6, tmp6, C->i);
+  mpz_mod(tmp6, tmp6, C->p); // dX₁X₂Y₁Y₂
+  mpz_sub(tmp7, tmp2, tmp6); // (Ζ₁Ζ₂)² - dX₁X₂Y₁Y₂
+  mpz_add(tmp8, tmp2, tmp6); // (Ζ₁Ζ₂)² + dX₁X₂Y₁Y₂
+
+  mpz_sub(res->X, tmp5, tmp3);
+  mpz_sub(res->X, res->X, tmp4);
+  mpz_mul(res->X, res->X, tmp7);
+  mpz_mod(res->X, res->X, C->p);
+  mpz_mul(res->X, res->X, tmp1);
+  mpz_mod(res->X, res->X, C->p);
+
+  mpz_sub(res->Y, tmp4, tmp3);
+  mpz_mul(res->Y, res->Y, tmp8);
+  mpz_mod(res->Y, res->Y, C->p);
+  mpz_mul(res->Y, res->Y, tmp1);
+  mpz_mod(res->Y, res->Y, C->p);
+
+  mpz_mul(res->Z, tmp7, tmp8);
+  mpz_mod(res->Z, res->Z, C->p);
+}
+
+/* Formule de doublement d'Edwards (fait appel à l'addition unifiée). */
+void e_double(point_t res, const point_t P, const curve_t C) {
+  e_add(res, P, P, C);
+}
+
+
+/******************** Double and add *******************************
+
+Un double and add classique gauche-droite, et une échelle de
+Montgomery.
+
+*******************************************************************/
+
+/*
+  Cet algorithme marche pour Weierstrass et Edwards
+*/
+void double_and_add(point_t res, const point_t P, const mpz_t n, const curve_t C,
+		    const char model) {
   long i;
   point_t tmp;
-  point_init(tmp);
+  point_init(tmp, model);
   for (i = mpz_sizeinbase(n, 2) - 1; i >= 0; i--) {
-    w_double(tmp, tmp, C);
+    model == WEIERSTRASS ? w_double(tmp, tmp, C) : e_double(tmp, tmp, C);
     if (mpz_tstbit(n, i)) {
       /* Si le bit vaut 1 */
-      w_add(tmp, tmp, P, C);
+      model == WEIERSTRASS ? w_add(tmp, tmp, P, C) : e_add(tmp, tmp, P, C);
     }
   }
   point_copy(res, tmp);
 }
 
-/* L'algorithme de factorisation ECM */
-int ecm(mpz_t res, const mpz_t N, unsigned long B, gmp_randstate_t rand) {
+/****************************** ECM **********************************
+
+L'algorithme ECM, qui prend en paramètre le modèle (void définitions
+des macros).
+
+Remarquez que dans la vraie vie les courbes sont choisies de façon à
+avoir des propriétés spéciales (essentiellement, de façons à avoir
+beaucoup de points de (petite) torsion sur ℚ, et par conséquent une
+plus grande probabilité d'avoir un cardinal friable modulo des nombres
+premiers).
+
+Voir, par exemple <http://eecm.cr.yp.to/>.
+
+Ici nous faisons un choix plus proche de l'algorithme original de
+Lenstra, en choisissant d'abord les coordonnées du point, et ensuite
+une courbe qui contient ce point.
+
+*********************************************************************/
+int ecm(mpz_t res, const mpz_t N, unsigned long B, gmp_randstate_t rand, char model) {
   mpz_t exp;
   curve_t C;
   point_t P;
+  __mpz_struct* zero_coord;
+
   // On initialise l'exposant e à B!
   mpz_inits(exp, C->p, C->i, NULL);
   mpz_fac_ui(exp, B);
-  // On initialise une courbe C au hasard
-  mpz_set(C->p, N);
-  mpz_urandomm(C->i, rand, N);
-  // On initilise un point P au hasard (on ne vérifie même pas qu'il
-  // appartient à C)
-  point_init(P);
-  mpz_urandomm(P->X, rand, N);
-  mpz_urandomm(P->Y, rand, N);
-  mpz_set_ui(P->Z, 1);
-  // On calcule exp*P
-  double_and_add(P, P, exp, C);
-  mpz_invert(tmp1, P->Z, C->p);
-  mpz_mul(tmp2, P->X, tmp1);
-  mpz_mod(tmp2, tmp2, C->p);
-  mpz_mul(tmp3, P->Y, tmp1);
-  mpz_mod(tmp3, tmp3, C->p);
-  // On essaye d'inverser la coordonnée Z
-  mpz_gcd(res, P->Z, N);
+
+  switch (model) {
+  case WEIERSTRASS:
+    /*
+      On initialise une courbe
+        y² = x³ + ax + ?
+      au hasard.
+    */
+    mpz_set(C->p, N);
+    mpz_urandomm(C->i, rand, N);
+
+    // On initilise un point P au hasard (le b de la courbe va dépendre de P)
+    point_init(P, model);
+    mpz_urandomm(P->X, rand, N);
+    mpz_urandomm(P->Y, rand, N);
+    mpz_set_ui(P->Z, 1);
+
+    // On calcule exp*P
+    double_and_add(P, P, exp, C, model);
+
+    // Si la courbe a un cardinal friable, P = 0 et Z = 0
+    zero_coord = P->Z;
+    break;
+  case EDWARDS:
+    // On initilise un point P au hasard
+    point_init(P, model);
+    mpz_urandomm(P->X, rand, N);
+    mpz_urandomm(P->Y, rand, N);
+    mpz_set_ui(P->Z, 1);
+    /*
+      On détermine
+
+        x² + y² = 1 + dx²y²
+
+      avec 
+
+        d = (x² + y² - 1) / x²y²
+    */
+    mpz_mul(tmp1, P->X, P->X);
+    mpz_mod(tmp1, tmp1, N);
+    mpz_mul(tmp2, P->Y, P->Y);
+    mpz_mod(tmp2, tmp2, N);
+    mpz_mul(tmp3, tmp1, tmp2);
+
+    mpz_add(tmp1, tmp1, tmp2);
+    mpz_sub_ui(tmp1, tmp1, 1);
+
+    if (!mpz_invert(tmp4, tmp3, N)) {
+      // Surprise ! On a trouvé un facteur de N par pure chanche
+      zero_coord = tmp3;
+      break;
+    }
+    
+    mpz_mul(C->i, tmp1, tmp4);
+    mpz_mod(C->i, C->i, N);
+    mpz_set(C->p, N);
+
+    // On calcule exp*P
+    double_and_add(P, P, exp, C, model);
+
+    // Si la courbe a un cardinal friable, P = 0 et X = 0
+    zero_coord = P->X;
+    break;
+  case MONTGOMERY:
+    break;
+  default:
+    printf("Unknown model %c\n", model);
+    return 2;
+  }
+
+  // On essaye d'inverser la coordonnée qui doit être égale à 0
+  mpz_gcd(res, zero_coord, N);
 
   mpz_clears(exp, P->X, P->Y, P->Z, C->p, C->i, NULL);
 
@@ -254,7 +427,7 @@ int ecm(mpz_t res, const mpz_t N, unsigned long B, gmp_randstate_t rand) {
 
 /* Fonction qui affiche l'aide */
 void usage(char* prog) {
-  fprintf(stderr, "Usage: %s [-m (weierstrass|edwards|montgomery)] [-B smoothness bound] [-s seed] N\n", prog);
+  fprintf(stderr, "Usage: %s [-m (weierstrass|edwards|montgomery)] [-B <smoothness bound>] [-s <seed>] [-r <number of tries>] N\n", prog);
 }
 
 int main(int argc, char** argv) {
@@ -277,11 +450,11 @@ int main(int argc, char** argv) {
      -r : combien de fois il faut répéter le test
   */
   int opt;
-  char model = 'w';
+  char model = WEIERSTRASS;
   while ((opt = getopt(argc, argv, "hm:B:s:r:")) != -1) {
     switch (opt) {
     case 'm':
-      model = optarg[0];
+      model = optarg[0] < 0x5B ? optarg[0] : optarg[0] - 0x20;
       break;
     case 'B':
       B = atol(optarg);
@@ -299,39 +472,24 @@ int main(int argc, char** argv) {
     }
   }
 
-  // Execution de l'algorithme
+  // Exécution de l'algorithme
   if (optind > 0 && optind < argc) {
     // On lit l'entier sur la ligne de commande
     mpz_init_set_str(N, argv[optind], 10);
 
-    // On choisit l'algo à exécuter
     int status;
-    switch (model) {
-    case 'w':
-    case 'W':
-      for (r--; r >=0 && (status = ecm(x, N, B, rand)); r--);
-      break;
-    case 'e':
-    case 'E':
-      printf("Not implented yet.\n");
-      break;
-    case 'm':
-    case 'M':
-      printf("Not implented yet.\n");
-      break;
-    default:
-      usage(argv[0]);
-      printf("Unknown model %c\n", model);
-      return 1;
+    for (r--; r >=0 && (status = ecm(x, N, B, rand, model)) == 1; r--);
+
+    if (status == 0) {
+      // On teste que le résultat divise vraiment N
+      assert(mpz_divisible_p(N, x));
+      // On calcule le cofacteur et on affiche
+      mpz_divexact(N, N, x);
+      gmp_printf("%Zd * %Zd\n", x, N);
+    } else {
+      gmp_printf("%Zd\n", x);
     }
 
-    // On teste que le résultat divise vraiment N
-    assert(mpz_divisible_p(N, x));
-    // On calcule le cofacteur et on affiche
-    mpz_divexact(N, N, x);
-    gmp_printf("%Zd * %Zd\n", x, N);
-
-    
     // On renvoie 0 si le test a trouvé un facteur non trivial
     return status;
   } else {
