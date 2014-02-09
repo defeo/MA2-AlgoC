@@ -293,6 +293,93 @@ void e_double(point_t res, const point_t P, const curve_t C) {
   e_add(res, P, P, C);
 }
 
+/*********************** Montgomery ********************************
+
+La courbe a equation
+
+  By² = x³ + Ax² + x
+
+Dans les algorithmes qui suivent, C->i est l'invariant (A+2)/4.
+
+*******************************************************************/
+
+/*
+  Formule d'addition différentielle de Montgomery. Calcule P+Q
+  connaissant D = P-Q.
+*/
+void m_diffadd(point_t res, const point_t P, const point_t Q, 
+	       const point_t D, const curve_t C) {
+  // On vérifie que P ≠ 0 et Q ≠ 0
+  if (mpz_sgn(P->Z) == 0) {
+    point_copy(res, Q);
+    return;
+  } else if (mpz_sgn(Q->Z) == 0) {
+    point_copy(res, P);
+    return;
+  }
+
+  /*
+    Formule projective
+
+      X = Z₁ (X₂X₃ - Z₂Z₃)²
+      Z = X₁ (X₂Z₃ - Z₂X₃)²
+
+    Voir <http://www.hyperelliptic.org/EFD/g1p/auto-montgom-xz.html#diffadd-dadd-1987-m-3>.
+  */
+  mpz_add(tmp1, P->X, P->Z); // X₂ + Z₂
+  mpz_sub(tmp2, P->X, P->Z); // X₂ - Z₂
+  mpz_add(tmp3, Q->X, Q->Z); // X₃ + Z₃
+  mpz_sub(tmp4, Q->X, Q->Z); // X₃ - Z₃
+  mpz_mul(tmp5, tmp4, tmp1);
+  mpz_mod(tmp5, tmp5, C->p); // X₂X₃ - Z₂Z₃ + X₃Z₂ - Z₃X₂
+  mpz_mul(tmp6, tmp2, tmp3);
+  mpz_mod(tmp6, tmp6, C->p); // X₂X₃ - Z₂Z₃ + X₂Z₃ - Z₂X₃
+
+  mpz_sub(tmp3, tmp5, tmp6);
+  // On vérifie que P ≠ -Q
+  if (mpz_sgn(tmp3) == 0) {
+    mpz_set_ui(res->X, 0);
+    mpz_set_ui(res->Z, 0);
+    return;
+  }
+  mpz_mul(tmp4, tmp3, tmp3);
+  mpz_mod(tmp3, tmp4, C->p); // 4(X₃Z₂ - Z₃X₂)²
+  mpz_mul(tmp4, D->X, tmp3); // 4X₁ (X₃Z₂ - Z₃X₂)²
+  mpz_add(tmp1, tmp5, tmp6);
+  mpz_mul(tmp2, tmp1, tmp1);
+  mpz_mod(tmp1, tmp2, C->p); // 4(X₂X₃ - Z₂Z₃)²
+  mpz_mul(tmp2, D->Z, tmp1); // 4Z₁ (X₂X₃ - Z₂Z₃)²
+  mpz_mod(res->X, tmp2, C->p);
+  mpz_mod(res->Z, tmp4, C->p);
+}
+
+/*
+  Formule de doublement de Montgomery. 
+*/
+void m_double(point_t res, const point_t P, const curve_t C) {
+  /*
+    Formule projective
+
+      X₂ = (X + Z)² (X - Z)²
+      Z = 4XZ ((X - Z)² + 4XZ (A + 2)/4 )
+
+    Voir <http://www.hyperelliptic.org/EFD/g1p/auto-montgom-xz.html#doubling-dbl-1987-m-3>
+  */
+  mpz_add(tmp1, P->X, P->Z);
+  mpz_mul(tmp2, tmp1, tmp1);
+  mpz_mod(tmp1, tmp2, C->p); // (X + Z)²
+  mpz_sub(tmp2, P->X, P->Z);
+  mpz_mul(tmp3, tmp2, tmp2);
+  mpz_mod(tmp2, tmp3, C->p); // (X - Z)²
+  mpz_sub(tmp3, tmp1, tmp2); // 4XZ
+  mpz_mul(tmp4, tmp1, tmp2);
+  mpz_mod(res->X, tmp4, C->p);
+  mpz_mul(tmp5, tmp3, C->i);
+  mpz_mod(tmp5, tmp5, C->p); // (A + 2) XZ
+  mpz_add(tmp6, tmp2, tmp5);
+  mpz_mul(tmp7, tmp3, tmp6);
+  mpz_mod(res->Z, tmp7, C->p);
+}
 
 /******************** Double and add *******************************
 
@@ -301,22 +388,39 @@ Montgomery.
 
 *******************************************************************/
 
-/*
-  Cet algorithme marche pour Weierstrass et Edwards
-*/
 void double_and_add(point_t res, const point_t P, const mpz_t n, const curve_t C,
 		    const char model) {
   long i;
-  point_t tmp;
-  point_init(tmp, model);
-  for (i = mpz_sizeinbase(n, 2) - 1; i >= 0; i--) {
-    model == WEIERSTRASS ? w_double(tmp, tmp, C) : e_double(tmp, tmp, C);
-    if (mpz_tstbit(n, i)) {
-      /* Si le bit vaut 1 */
-      model == WEIERSTRASS ? w_add(tmp, tmp, P, C) : e_add(tmp, tmp, P, C);
+  point_t tmp1, tmp2;
+  point_init(tmp1, model);
+  switch (model) {
+  case WEIERSTRASS:
+    for (i = mpz_sizeinbase(n, 2) - 1; i >= 0; i--) {
+      w_double(tmp1, tmp1, C);
+      if (mpz_tstbit(n, i)) w_add(tmp1, tmp1, P, C);
     }
+    break;
+  case EDWARDS:
+    for (i = mpz_sizeinbase(n, 2) - 1; i >= 0; i--) {
+      e_double(tmp1, tmp1, C);
+      if (mpz_tstbit(n, i)) e_add(tmp1, tmp1, P, C);
+    }
+    break;
+  case MONTGOMERY:
+    point_init(tmp2, model);
+    point_copy(tmp2, P);
+    for (i = mpz_sizeinbase(n, 2) - 1; i >= 0; i--) {
+      if (mpz_tstbit(n, i)) {
+	m_diffadd(tmp1, tmp1, tmp2, P, C);
+	m_double(tmp2, tmp2, C);
+      } else {
+	m_diffadd(tmp2, tmp1, tmp2, P, C);
+	m_double(tmp1, tmp1, C);
+      }
+    }
+    break;
   }
-  point_copy(res, tmp);
+  point_copy(res, tmp1);
 }
 
 /****************************** ECM **********************************
@@ -410,6 +514,24 @@ int ecm(mpz_t res, const mpz_t N, unsigned long B, gmp_randstate_t rand, char mo
     zero_coord = P->X;
     break;
   case MONTGOMERY:
+    /*
+      On initialise une courbe
+        ?y² = x³ + ax² + x
+      au hasard.
+    */
+    mpz_set(C->p, N);
+    mpz_urandomm(C->i, rand, N);
+
+    // On initilise un point P au hasard (le b de la courbe va dépendre de P)
+    point_init(P, model);
+    mpz_urandomm(P->X, rand, N);
+    mpz_set_ui(P->Z, 1);
+
+    // On calcule exp*P
+    double_and_add(P, P, exp, C, model);
+
+    // Si la courbe a un cardinal friable, P = 0 et Z = 0
+    zero_coord = P->Z;
     break;
   default:
     printf("Unknown model %c\n", model);

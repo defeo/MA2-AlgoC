@@ -880,7 +880,7 @@ $$v^2 = u^3 + \frac{a}{b}u^2 + \frac{1}{b^2}u$$
 La loi de groupe en est déduite immédiatement.
 
 Addition différentielle, coordonnées projectives :
-$$(x_1:z_1) ⊕ (x_2:z_2) = (X:Z)$$ avec $$P\ominus Q = (x_3:z_3)$$
+$$(x_2:z_2) ⊕ (x_3:z_3) = (X:Z)$$ avec $$P\ominus Q = (x_1:z_1)$$
 
 $$X = z_1(x_2x_3 - z_2z_3)^2, \quad Z = x_1(x_2z_3 - z_2x_3)^2$$
 
@@ -917,7 +917,56 @@ $$P$$, et on procède de façon similaire à un *double-and-add*.
 
 Il s'agit de la généralisation des méthodes $$p-1$$ et $$p+1$$, où aux
 groupes $$\mathbb{G}_m(𝔽_p),C(𝔽_p)$$ l'on substitue des courbes
-elliptiques tirées au hasard.
+elliptiques tirées au hasard.  Comme dans les méthodes précédentes, on
+se fixe une borne $$B$$ et on calcule :
+
+$$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
+
+On sélectionne une courbe $$E$$ au hasard, à coefficients modulo
+$$N$$, en espérant que la cardinalité de $$E(𝔽_p)$$ soit $$B$$-friable
+($$p$$ étant un facteur de $$N$$). Dans ce cas, pour tout point $$P$$
+de $$E$$ on a $$[x]P=0$$ modulo $$p$$. Si la cardinalité de $$E$$ modulo
+les autres facteurs de $$N$$ n'est pas friable, on a trouvé un facteur
+non trivial de $$N$$. En effet, si $$E$$ est en forme de Weierstraß,
+et $$P$$ est en coordonnées projectives, alors $$[x]P$$ est équivalent
+à $$(0:λ:0)$$ modulo $$p$$. Un pgcd entre $$N$$ et la coordonnée
+$$z$$ de $$P$$ nous donnera alors le facteur cherché.
+
+Comparé avec les méthodes $$p-1$$ et $$p+1$$, ECM présente l'avantage
+de pouvoir être *redémarré* : si la courbe $$E$$ n'a pas donné une
+factorisation de $$N$$, on peut essayer avec une nouvelle courbe, sans
+changer la borne $$B$$. Il est alors pertinent de se demander combien
+de courbes il faudra essayer en moyenne avant de tomber sur un facteur
+de $$N$$. Des arguments heuristiques montrent qu'en choisissant $$B$$
+de l'ordre de $$L_p(1/2)$$, la probabilité de succès d'un tour de ECM
+est aussi de l'ordre $$L_p(1/2)$$. Ceci donne une complexité en
+moyenne (ECM est un algorithme de type *Las Vegas*) de $$L_p(1/2)$$,
+où $$p$$ est le plus petit facteur de $$N$$. En pratique, ECM est
+utilisé pour trouver les facteurs de 20-30 chiffres ; ce
+[tableau](http://www.loria.fr/~zimmerma/records/ecm/params.html)
+synthétise les choix de paramètres effectués par
+[ECM-GMP](http://ecm.gforge.inria.fr/), une des implantation les plus
+connues.
+
+Il y a un passage délicat dans ECM : comment choisir la courbe
+aléatoire. Le papier original de Lenstra commence par choisir les
+coordonnées $$x,y$$ du point de départ, et le paramètre $$a$$ de la
+courbe. L'autre paramètre de la courbe est ensuite détermine par
+
+$$b = y^2 - x^3 - ax.$$
+
+Ceci évite d'avoir a prendre des racines carrées dans $$ℤ/Nℤ$$. On
+peut donner des formules équivalentes pour les formes d'Edwards ou de
+Montgomery.
+
+En pratique, les meilleures implantations d'ECM utilisent des familles
+de courbes spéciales, qui ont une meilleure chance d'avoir un cardinal
+friable modulo tous les premiers. Ce sont des courbes avec une grande
+torsion sur $$ℚ$$ : les courbes de Montgomery et d'Edwards sont déjà
+un pas en cette direction, en effet elles ont des points de $$2$$ et
+$$4$$ torsion sur $$ℚ$$ ; les courbes de Suyama sont les
+sous-familles actuellement les plus populaires.
+
 
 
 ### Excercices
@@ -937,7 +986,12 @@ elliptiques tirées au hasard.
 
 5. Implanter ECM. Le tester sur les entiers suivants
    
+   * 2535301200456606295881202795651
    * 1393796574908163986240549427302845248438701
-   * 1532495540865888858358363506942984602634210860718886417
-
-Voici une [solution]({{site.github_blob}}/sources/ecm.c) de ces exercices.
+   * 29642774844752946049324366737590977992482623274839098226894115410059389791374319
+   
+Voici une [solution]({{site.github_blob}}/sources/ecm.c) de ces
+exercices. On constate que le modèle d'Edwards est légèrement plus
+rapide que celui de Weierstraß (mais son code est beaucoup plus
+simple, et pourrait être amélioré). Le modèle de Montgomery, quant à
+lui, est presque deux fois plus rapide.
