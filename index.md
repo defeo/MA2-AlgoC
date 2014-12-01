@@ -4,6 +4,8 @@ title: Algorithmique et programmation C
 plugins: ['mathjax', 'highlight']
 ---
 
+{% include defs.html %}
+
 # Algorithmique et programmation C
 
 Notes de cours pour le cours *Algorithmique et programmation C* du
@@ -447,7 +449,7 @@ Nous allons commencer par installer GMP, *from scratch*.
     seulement $$O(\log n)$$ additions et multiplications.
 
     Vous trouverez ici une
-	[solution]({{site.github_blob}}/sources/fibonacci.c). Elle
+	[solution]({{github_blob}}/sources/fibonacci.c). Elle
 	pourrait être améliorée, mais ses performances ne sont pas tout à
 	fait ridicules (par comparaison, la fonction `fibo` de Pari/gp est
 	environ six fois plus rapide). On a choisi d'utiliser le format
@@ -579,7 +581,7 @@ Lemmermeyer : <http://www.fen.bilkent.edu.tr/~franz/crypto/cryp06.pdf>
 	* 6500836418678143176619908800773996927084289993776850414594757469264912497841920022968113.
 	
 	Voici la
-    [solution]({{site.github_blob}}/sources/factor.c). Remarquez que
+    [solution]({{github_blob}}/sources/factor.c). Remarquez que
     l'implantation des méthodes $$p-1$$ et $$p+1$$ ne correspond pas
     exactement à l'exposition donnée plus haut : l'exposant $$e$$ est
     égal ici à $$B!$$. Cela donne un algorithme similaire, avec des
@@ -990,7 +992,7 @@ sous-familles actuellement les plus populaires.
    * 1393796574908163986240549427302845248438701
    * 29642774844752946049324366737590977992482623274839098226894115410059389791374319
    
-Voici une [solution]({{site.github_blob}}/sources/ecm.c) de ces
+Voici une [solution]({{github_blob}}/sources/ecm.c) de ces
 exercices. On constate que le modèle d'Edwards est légèrement plus
 rapide que celui de Weierstraß (mais son code est beaucoup plus
 simple, et pourrait être amélioré). Le modèle de Montgomery, quant à
