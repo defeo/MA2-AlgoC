@@ -1,6 +1,10 @@
 baseurl: /MA2-AlgoC
 permalink: /:categories/:title
 
+collections:
+  projects:
+    output: true
+
 kramdown:
   toc_levels: 2..2
   parse_block_html: true
