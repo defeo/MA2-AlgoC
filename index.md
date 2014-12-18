@@ -760,6 +760,7 @@ bibliothèque
 	./configure --prefix=$HOME --enable-profiling=gprof
 	make clean
 	make
+	make install
 
 Ensuite, pour *linker* statiquement les bibliothèques au moment de la
 compilation, il faut passer l'option `-static` au *linker*. Il ne
