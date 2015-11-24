@@ -24,3 +24,8 @@ méthodes.
 - Connaissances de base en algèbre linéaire et corps finis.
 
 # Références
+
+- <https://en.wikipedia.org/wiki/Strassen_algorithm>.
+
+- P. Giorgi, C.-P. Jeannerod, G. Villard.
+  [*On the Complexity of Polynomial Matrix Computations*](http://lara.inist.fr/bitstream/handle/2332/819/RR2003-0?sequence=1).
