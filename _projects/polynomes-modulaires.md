@@ -37,4 +37,9 @@ polynômes à coefficients dans $$\mathbb{F}_p$$ est conseillée.
 
 # Références
 
+- A. Bostan, F. Chyzak, M. Giusti, R. Lebreton, G. Lecerf, B. Salvy,
+  É. Schost.
+  [*Algorithmes Efficaces en Calcul Formel*](http://perso.ens-lyon.fr/bruno.salvy/mpri/poly.pdf),
+  chapitre 4.
+
 - <https://en.wikipedia.org/wiki/Division_algorithm#Newton.E2.80.93Raphson_division>

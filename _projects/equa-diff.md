@@ -24,6 +24,10 @@ polynômes est conseillée.
 
 # Références
 
+- A. Bostan, F. Chyzak, F. Ollivier, B. Salvy, É. Schost,
+  A. Sedoglavic.
+  [*Fast computation of power series solutions of systems of differential equations*](http://arxiv.org/pdf/cs/0604101.pdf).
+
 - A. Bostan, F. Chyzak, M. Giusti, R. Lebreton, G. Lecerf, B. Salvy,
   É. Schost.
   [*Algorithmes Efficaces en Calcul Formel*](http://perso.ens-lyon.fr/bruno.salvy/mpri/poly.pdf).
