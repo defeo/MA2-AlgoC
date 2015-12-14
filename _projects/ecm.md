@@ -2,6 +2,7 @@
 layout: project
 title: Modèles rationnels pour ECM et EECM
 keywords: [courbes elliptiques, factorisation]
+plugins: mathjax
 ---
 
 Le but de ce projet est d'analyser des variantes de l'algorithme de

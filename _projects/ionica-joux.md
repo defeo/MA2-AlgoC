@@ -2,6 +2,7 @@
 layout: project
 title: Pairing the volcano
 keywords: [courbes elliptiques, couplages, isogénies]
+plugins: mathjax
 ---
 
 Le but de ce projet est l'implantation des algorithmes présentés dans
@@ -16,7 +17,7 @@ morphismes de variétés algébriques.
 
 Les isogénies d'une courbe $$E$$ vers elle même sont appelées des
 *endomorphismes*. L'exemple le plus simple d'endomorphisme est la
-multiplication par un scalaire $n∈ℤ$. L'endomorphisme de Frobenius
+multiplication par un scalaire $$n∈ℤ$$. L'endomorphisme de Frobenius
 d'une courbe définie sur un corps fini est un autre exemple. Le
 théorème de l'isogénie duale dit que pour toute isogénie $$φ:E→E'$$ de
 degré $$n$$ il existe une isogénie $$\hat{φ}:E'→E$$, dite la duale de
