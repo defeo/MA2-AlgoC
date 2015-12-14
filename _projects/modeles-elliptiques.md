@@ -46,7 +46,11 @@ avoir recours à une bibliothèque de grands entiers.
 
 - Implanter le modèle des intersections de Jacobi projectif.
 
+- Implanter le modèle Hessien projectif.
+
 - Implanter le modèle de Montgomery et la multiplication par échelle.
+
+- Implanter les formules de conversion entre les différents modèles.
 
 - Comparer les performances des implantations.
 
