@@ -399,10 +399,11 @@ Par exemple, pour le type `mpz_t`, on fera
 
 	mpz_t x;
 	mpz_init(x);
-	mpz_set_str(x, "12345", 10);  # met 12345 (lu en base 10) dans x
+	mpz_set_str(x, "12345", 10);  // met 12345 (lu en base 10) dans x
 	mpz_mul(x, x, x);
 	gmp_printf("%Zd\n", x);
 	mpz_clear(x);
+{:.c}
 
 Les fonctions sur les entiers sont documentées ici :
 <https://gmplib.org/manual/Integer-Functions.html#Integer-Functions>. Ce
