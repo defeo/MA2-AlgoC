@@ -415,7 +415,7 @@ cours.
 Nous allons commencer par installer GMP, *from scratch*.
 
 1. Téléchargez la dernière version de GMP ici :
-   <http://bourbaki.math.uvsq.fr/~defeo/gmp-6.0.0a.tar.bz2> (ou ici
+   <http://bourbaki.math.uvsq.fr/~defeo/gmp-latest.tar.bz2> (ou ici
    <https://gmplib.org/#DOWNLOAD>), et décompressez-la avec la
    commande `tar xf`.
 
