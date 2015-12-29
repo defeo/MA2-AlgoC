@@ -60,5 +60,5 @@ des entiers.
   [*A note on NUCOMP*](http://www.ams.org/journals/mcom/2003-72-244/S0025-5718-03-01518-7/S0025-5718-03-01518-7.pdf).
 - C. P. Schnorr, H. W. Lenstra.
   [*A Monte Carlo factoring algorithm with linear storage*](http://www.ams.org/journals/mcom/1984-43-167/S0025-5718-1984-0744939-5/S0025-5718-1984-0744939-5.pdf).
-- H. Cohen.  *A course in computation algebraic number theory*,
+- H. Cohen.  [*A course in computation algebraic number theory*](http://link.springer.com/content/pdf/10.1007/978-3-662-02945-9.pdf),
   chapitres 5 et 10.
