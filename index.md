@@ -1,7 +1,5 @@
 ---
-layout: index
 title: Algorithmique et programmation C
-plugins: ['mathjax', 'highlight']
 ---
 
 {% include defs.html %}

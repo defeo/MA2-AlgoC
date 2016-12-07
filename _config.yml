@@ -1,10 +1,59 @@
-baseurl: /MA2-AlgoC
+# Settings
 permalink: /:categories/:title
 
+# About
+title: eLeMentS
+tagline: A Jekyll-based DIY Learning Management System
+authors:
+  - name: the eLeMentS team
+    url: 'https://elementsLMS.github.io/'
+created: 2016
+license:
+  name: MIT license
+  shortname: MIT license
+  url: /LICENSE
+
+# Display a log in the top bar
+#logo: assets/logo/eLeMentS.svg
+
+# Display a GitHub fork me logo in the lower right corner
+#forkme: yes
+
+# Default configuration for pages.
+# Can be used to activate addons on all pages.
+defaults:
+  - scope:
+      path: ''
+    values:
+      layout: default
+      addons:
+        favicon: yes
+        mathjax: yes
+        highlightjs: yes
+#        print-link: yes
+#        about: yes
+
+# Collections
 collections:
+  # Leave that addons collection like this
+  # if you want to use addons
+  addons:
+    output: true
+    permalink: /:collection/:path:output_ext
   projects:
     output: true
 
+
+# Kramdown configuration (markdown parser)
 kramdown:
   toc_levels: 2..2
   parse_block_html: true
+
+# Prose.io configuration, if that's your style
+#prose: no
+
+# SASS configuration.
+# Better not touch this
+sass:
+  sass_dir: assets/css
+  style: compressed

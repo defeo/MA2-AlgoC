@@ -3,87 +3,179 @@
 <html>
   <head lang="en">
     <meta charset="utf-8">
-    <title>{{ page.title | strip_html }}</title>
+    <title>
+      {% unless page.title %}
+      {{ site.title }} – {{ site.tagline }}
+      {% else %}
+      {{ page.title }} – {{ site.title }}
+      {% endunless %}
+    </title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="{{ '/assets/css/font-awesome.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+    <link href="{{ github_commits }}.atom" rel="alternate" title="Recent Commits to {{ site.github.repository_name }}" type="application/atom+xml" />
 
-    {% if page.plugins contains 'highlight' %}
-    <link rel="stylesheet" href="//yandex.st/highlightjs/8.0/styles/default.min.css">
-    {% endif %}
-
-    <link rel="stylesheet" href="{{ site.baseurl }}/css/main.css">
+    <!-- Links (stylesheets, feeds, ...) added by add-ons -->
+    {% for a in page.addons %}
+    <!-- Add-on: {{ a[0] }} -->
+    {% assign docs = site.addons | where:'name',a[0] %}
+    {% for d in docs %}{% assign base = d.url | append: '/../' %}{% for l in d.links %}
+    <link class="elements-addon-{{ d.name }}"
+	  rel="{% include utils/default.str val=l.rel default='stylesheet'  %}"
+	  href="{% include utils/joinpath.str root=site.baseurl base=base path=l.href %}"
+	  type="{% include utils/default.str val=l.type default='text/css' %}"
+	  title="{{ l.title }}">
+    {% endfor %}{% endfor %}{% endfor %}
+    
     {% for s in page.styles %}
     <link rel="stylesheet" href="{{ s }}"/>
     {% endfor %}
-
-    <link href="{{ github_commits }}.atom" rel="alternate" title="Recent Commits to {{ site.github.repository_name }}" type="application/atom+xml" />
-
-    <script src="{{ site.baseurl }}/js/polyfills.js"></script>
+    
+    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
   </head>
   <body>
 
-    <a id="forkme" class="dont-print" href="{{ site.github.repository_url }}">
-      <img style="position: absolute; top: 0; right: 0; border: 0;"
-	   src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
-	   alt="Fork me on GitHub"></a>
+    <nav id="topbar" class="toggleables">
+      <div id="logo"><a href="{{ '/' | relative_url }}">
+	{% if site.logo %}<img src="{{ site.logo | relative_url }}" alt="{{ site.title }}">
+	{% else %}{{ site.title }}{% endif %}
+      </a></div>
 
-    <ul class="menu dont-print" id="top-menu">
-      <li><a href="{{ site.baseurl }}/">Home</a></li>
-      <li><a href="{{ site.baseurl }}/projects.html">Projets étudiants</a></li>
-      <li><a href="{{ github_blob }}/{{ page.path }}">Source</a></li>
-      <li><a href="{{ github_edit }}/{{ page.path }}">Quick edit</a></li>
-      <li><a href="javascript:window.print()">Print</a></li>
-      <li><a href="{{ site.baseurl }}/HELP">Help</a></li>
-    </ul>
+      <button class="toggle" data-target="#top-menu">
+	<i class="fa fa-bars"></i>
+      </button>
+      
+      <ul class="menu" id="top-menu">
+	<li><a href="{{ github_blob }}/{% include utils/rel_path.str %}" target="_blank">
+	    <i class="icon fa fa-code"></i>
+	    <span class="title">Source</span>
+	</a></li>
 
+	<!-- Prose.io/GitHub integration -->
+	{% if site.prose %}
+	{% if site.prose.proseurl %}
+	{% assign cms_base = site.prose.proseurl %}
+	{% assign cms_qs = '' %}
+	{% else %}
+	{% capture cms_base %}http://prose.io/#{{ site.github.repository_nwo }}{% endcapture %}
+	{% endif %}
+	{% else %}
+	{% assign cms_base = site.github.repository_url %}
+	{% assign cms_qs = '?message=Created new <name>&amp;value=<template>' %}
+	{% endif %}
+	<li id="menu-edit">
+	    <a href="{{ cms_base }}/edit/{{ github_branch }}/{% include utils/rel_path.str %}"
+	       target="_blank">
+	    <i class="icon fa fa-edit"></i>
+	    <span class="title">Edit</span>
+	</a></li>
+	{% if site.create %}
+	<li id="menu-create">
+	    <a class="toggle" data-target="#menu-create .submenu" data-group="#topbar .menu">
+	    <i class="icon fa fa-plus"></i>
+	    <span class="title">New</span></a>
+	    <ul class="submenu">
+	      {% if site.create.pages %}
+	      <li><a href="{{ cms_base | strip_newlines }}/new/{{ github_branch }}/"
+		     target="_blank">
+		  <i class="icon fa fa-file-text-o"></i>
+		  <span class="title">New page</span>
+	      </a></li>
+	      {% endif %}
+	      {% for c in site.create.collections %}
+	      {% if c.key == 'posts' %}
+	      <li><a href="{{ cms_base | strip_newlines }}/new/{{ github_branch }}/_posts{{ cms_qs | replace: '<name>','post' | replace: '<template>',c.template | uri_escape }}"
+		     target="_blank">
+		  <i class="icon fa fa-newspaper-o"></i>
+		  <span class="title">New post</span>
+	      </a></li>
+	      {% else %}
+	      {% assign coll = site.collections | where:'label', c.key | first %}
+	      <li><a href="{{ cms_base | strip_newlines }}/new/{{ github_branch }}/{{ coll.relative_directory }}{{ cms_qs | replace: '<name>',coll.name.one | replace: '<template>',c.template | uri_escape }}"
+		     target="_blank">
+		  <i class="icon fa fa-{% include utils/default.str val=coll.icon default='file-text-o' %}"></i>
+		  <span class="title">New {{ coll.name.one }}</span>
+	      </a></li>
+	      {% endif %}
+	      {% endfor %}
+	    </ul>
+	</li>
+	{% endif %}
+
+	<!-- Menu entries added by add-ons -->
+	{% for a in page.addons %}
+	<!-- Add-on: {{ a[0] }} -->
+	{% assign docs = site.addons | where:'name',a[0] %}
+	{% for d in docs %}{% assign base = d.url | append: '/../' %}{% for m in d.menus %}
+	<li class="elements-addon-{{ d.name }}">
+	  <a {% if m.submenus %}class="toggle"{% endif %}
+	     data-target="#top-menu .elements-addon-{{ d.name }} .submenu"
+	     data-group="#topbar .menu"
+	     href="{% include utils/joinpath.str root=site.baseurl base=base path=m.href %}">
+	    {% if m.icon %}<i class="icon fa fa-{{ m.icon }}"></i>{% endif %}
+	    {% if m.title %}<span class="title">{{ m.title }}</span>{% endif %}
+	  </a>
+	  {% if m.submenus %}
+	  <ul class="submenu">
+	  {% for sub in m.submenus %}
+	    <li><a href="{% include utils/joinpath.str root=site.baseurl base=base path=sub.href %}">
+		{% if sub.icon %}<i class="icon fa fa-{{ sub.icon }}"></i>{% endif %}
+		{% if sub.title %}<span class="title">{{ sub.title }}</span>{% endif %}
+	    </a></li>
+	    {% endfor %}
+	  </ul>
+	  {% endif %}
+	</li>
+	{% endfor %}{% endfor %}{% endfor %}
+	</ul>
+    </nav>
+    
     <div class="main">
-      <div class="container">
-	{{ content }}
-      </div>
-
-      <footer class="footer">
-	<div class="container">
-	  <p><a rel="license"
-		href="http://creativecommons.org/licenses/by-sa/4.0/">
-	      <img alt="Creative Commons Licence" style="border-width:0"
-		   src="http://i.creativecommons.org/l/by-sa/4.0/80x15.png"/>
-	    </a> <a href="http://defeo.lu" class="print-link">Luca De
-	      Feo</a> {{ site.time | date:"%Y" }}, licensed
-	    under <a rel="license" class="print-link"
-		     href="http://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA
-	      4.0</a>.</p>
-
-	  <p class="dont-print">Source code available
-	    on <a href="{{ site.github.repository_url }}">GitHub</a>,
-	    static Website generated
-	    with <a href="http://jekyllrb.com/">Jekyll</a> and kindly
-	    hosted by <a href="http://pages.github.com/">GitHub</a>.</p>
-	</div>
-      </footer>
+      {{ content }}
     </div>
 
-    {% if page.plugins contains 'mathjax' %}
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        config: ["MMLorHTML.js"],
-        jax: ["input/TeX","input/AsciiMath","output/HTML-CSS","output/NativeMML"],
-        extensions: ["MathMenu.js","MathZoom.js"],
-        TeX: {
-          extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+    {% if site.forkme %}
+    <div id="forkme"><a href="{{ site.github.repository_url }}">Fork me on GitHub</a></div>
+    {% endif %}
+
+    <!-- We pass down data from the YAML front matter as a JS object -->
+    <script id="elements-data-json" type="application/json">
+      {
+	"page": {
+	  "title": {{ page.title | jsonify }},
+	  "layout": {{ page.layout | jsonify }},
+	  "dir": {{ page.dir | jsonify }},
+	  "name": {{ page.name | jsonify }},
+	  "path": {{ page.path | jsonify }},
+	  "url": {{ page.url | jsonify }},
+	  "addons": {{ page.addons | jsonify }}
+	}
+      }
+    </script>
+    <!-- Fix-me https://github.com/jekyll/jekyll/issues/5636
+      {
+        "page": {
+          {% for p in page %}{% unless "content next previous excerpt" contains p[0] %}
+          "{{ p[0] }}": {{ p[1] | jsonify }}{% unless forloop.last %},{% endunless %}
+          {% endunless %}{% endfor %}
         }
-      });
-    </script>
-    <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
-    {% endif %}
+      }
+    </script-->
+    <script>var eLeMentS = JSON.parse($('#elements-data-json').textContent);</script>
 
-    {% if page.plugins contains 'highlight' %}
-    <script src="//yandex.st/highlightjs/8.0/highlight.min.js"></script>
-    <script>
-      hljs.configure({
-        tabReplace: '    '
-      });
-      hljs.initHighlightingOnLoad();
-    </script>
-    {% endif %}
-
+    <!-- Scripts added by add-ons -->
+    {% for a in page.addons %}
+    <!-- Add-on: {{ a[0] }} -->
+    {% assign docs = site.addons | where:'name',a[0] %}
+    {% for d in docs %}{% assign base = d.url | append: '/../' %}{% for s in d.scripts %}
+    <script class="elements-addon-{{ d.name }}"
+	    src="{% include utils/joinpath.str root=site.baseurl base=base path=s.src %}"
+	    type="{% include utils/default.str val=s.type default='text/javascript' %}"
+	    {% if s.async %}async{% endif %}></script>
+    {% endfor %}{% endfor %}{% endfor %}
+    
     {% for s in page.scripts %}
     <script src="{{ s }}"></script>
     {% endfor %}
