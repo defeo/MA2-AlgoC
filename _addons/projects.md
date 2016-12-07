@@ -1,5 +1,10 @@
 ---
-layout: index
+name: projects
+layout: default
+menus:
+  - title: Projets étudiants
+    href: projects.html
+    icon: files-o
 title: Sujets de projet proposés
 ---
 

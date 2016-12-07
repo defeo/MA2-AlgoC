@@ -2,16 +2,16 @@
 permalink: /:categories/:title
 
 # About
-title: eLeMentS
-tagline: A Jekyll-based DIY Learning Management System
+title: Algorithmique et Programmation C
 authors:
-  - name: the eLeMentS team
-    url: 'https://elementsLMS.github.io/'
-created: 2016
+  - name: Luca De Feo
+    url: 'http://defeo.lu/'
+created: 2014
 license:
-  name: MIT license
-  shortname: MIT license
-  url: /LICENSE
+  name: Creative Commons 4.0 Attribution-ShareAlike
+  shortname: CC-BY-SA 4.0
+  url: http://creativecommons.org/licenses/by-sa/4.0/
+  badge: http://i.creativecommons.org/l/by-sa/4.0/80x15.png
 
 # Display a log in the top bar
 #logo: assets/logo/eLeMentS.svg
@@ -30,6 +30,7 @@ defaults:
         favicon: yes
         mathjax: yes
         highlightjs: yes
+        projects: yes
 #        print-link: yes
 #        about: yes
 
