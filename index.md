@@ -413,11 +413,35 @@ cours.
 
 ### Exercices
 
-Nous allons commencer par installer GMP, *from scratch*.
+Pour commencer, nous allons utiliser la version de GMP installée par
+défaut par le système. Elle est déjà présente sur bourbaki, il suffit
+d'ajouter `-lgmp` à la phase de linkage. Pour installer GMP sur votre
+Ubuntu, utilisez la commande
+
+	sudo apt-get install libgmp3-dev
+
+1. La suite de Fibonacci est définie par une récurrence linéaire, qui
+   peut être représentée sous forme matricielle par
+
+	$$\begin{pmatrix}f_{n}\\f_{n+1}\end{pmatrix} = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix} \begin{pmatrix}f_{n-1}\\f_n\end{pmatrix}.$$
+
+	Écrire un programme qui prend en entrée $$n$$ et qui affiche le
+    $$n$$-ième nombre de Fibonacci. Le programme doit utiliser
+    seulement $$O(\log n)$$ additions et multiplications.
+
+    Vous trouverez ici une
+	[solution]({{github_blob}}/sources/fibonacci.c). Elle
+	pourrait être améliorée, mais ses performances ne sont pas tout à
+	fait ridicules (par comparaison, la fonction `fibo` de Pari/gp est
+	environ six fois plus rapide). On a choisi d'utiliser le format
+	`long` pour le paramètre $$n$$, en effet les tests montrent qu'il
+	est possible de calculer $$f_n$$ en quelques secondes pour
+	$$n\sim2^{25}$$.
+
+On va maintenant installer GMP *from scratch*.
 
 1. Téléchargez la dernière version de GMP ici :
-   <http://bourbaki.math.uvsq.fr/~defeo/gmp-latest.tar.bz2> (ou ici
-   <https://gmplib.org/#DOWNLOAD>), et décompressez-la avec la
+   <https://gmplib.org/#DOWNLOAD>, et décompressez-la avec la
    commande `tar xf`.
 
 2. Lisez le fichier `INSTALL`. Il vous dit que GMP se compile et
@@ -440,30 +464,8 @@ Nous allons commencer par installer GMP, *from scratch*.
     utilisateur. Ils contiennent respectivement le code objet,
     l'entête, et la documentation de GMP.
 
-3. La suite de Fibonacci est définie par une récurrence linéaire, qui
-   peut être représentée sous forme matricielle par
-
-	$$\begin{pmatrix}f_{n}\\f_{n+1}\end{pmatrix} = \begin{pmatrix} 0 & 1\\ 1 & 1\end{pmatrix} \begin{pmatrix}f_{n-1}\\f_n\end{pmatrix}.$$
-
-	Écrire un programme qui prend en entrée $$n$$ et qui affiche le
-    $$n$$-ième nombre de Fibonacci. Le programme doit utiliser
-    seulement $$O(\log n)$$ additions et multiplications.
-
-    Vous trouverez ici une
-	[solution]({{github_blob}}/sources/fibonacci.c). Elle
-	pourrait être améliorée, mais ses performances ne sont pas tout à
-	fait ridicules (par comparaison, la fonction `fibo` de Pari/gp est
-	environ six fois plus rapide). On a choisi d'utiliser le format
-	`long` pour le paramètre $$n$$, en effet les tests montrent qu'il
-	est possible de calculer $$f_n$$ en quelques secondes pour
-	$$n\sim2^{25}$$.
-
-Pour taper des commandes plus courtes, dans la suite nous allons
-utiliser la version de GMP installée par défaut par le système. Elle
-est déjà présente sur bourbaki, il suffit d'ajouter `-lgmp` à la phase
-de linkage. Pour installer GMP sur votre Ubuntu, utilisez la commande
-
-	sudo apt-get install libgmp3-dev
+3. Recompiler le programme en le linkant contre cette version de la
+   bibliothèque.
 
 
 ## Factorisation d'entiers
