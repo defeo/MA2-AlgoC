@@ -483,11 +483,22 @@ petit facteur $$p$$ de $$N$$. En effet, si l'on dispose de
 $$a,b∈ℤ/Nℤ$$ tels que $$a ≠ b$$ et $$a≡b\bmod p$$, alors
 $$p\vert\gcd(a-b, N)$$.
 
-Par le paradoxe des anniversaires, après avoir examiner
-$$O(\sqrt{p})$$ éléments, la probabilité d'avoir une collision modulo
-$$p$$ est de $$\frac{1}{2}$$. L'idée fondamentale de l'algorithme
-consiste à examiner $$O(\sqrt{p})$$ éléments, tout en gardant en
-mémoire seulement deux d'entre eux à chaque itération.
+La méthode pour trouver les collisions dérive de l'*algorithme de
+recherche de cycles de Floyd*: on construit une suite d'éléments de
+$$ℤ/Nℤ$$ à l'aide d'une fonction $$f$$ pseudo-aléatoire (souvent
+$$f(x)=x^2+c$$ pour une constante $$c$$). Par le paradoxe des
+anniversaires, on s'attend à ce que la suite boucle modulo $$p$$ après
+$$O(\sqrt{p})$$ éléments, et à ce moment là on dispose de plusieurs
+collsions.
+
+L'astuce centrale de l'algorithme de Floyd consiste à détecter le
+moment où la suite boucle sans avoir à stocker tous les
+$$O(\sqrt{p})$$ éléments. La suite est parcourue à deux *vitesses*
+différentes (en itérant les fonctions $$f$$ et $$f^2$$), et seulement
+les deux *têtes* de la suite sont comparées entre elles: lorsque la
+suite entre dans la boucle, les deux têtes jouent à se rattraper, et
+une collision est obtenue en au plus la longueur de la boucle.
+
 
 
 ### Méthode $$p-1$$
@@ -496,7 +507,7 @@ La méthode $$p-1$$ de Pollard se base sur le petit théorème de
 Fermat. Elle est très efficace lorsque $$N$$ a un facteur $$p$$ tel
 que $$p-1$$ n'a que des petits facteurs.
 
-On suppose que tous les facteurs de $$p-1$$ sont plus petits d'une
+On suppose que tous les facteurs de $$p-1$$ sont plus petits qu'une
 borne $$B$$ et on calcule
 
 $$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
@@ -555,7 +566,7 @@ multiply* pour calculer $$\alpha_m$$.
 
 La méthode $$p+1$$ s'ensuit en considérant une conique de Pell à
 coefficients dans $$ℤ/Nℤ$$. On suppose que tous les facteurs de
-$$p+1$$ sont plus petits d'une borne $$B$$ et on calcule $$x$$ comme
+$$p+1$$ sont plus petits qu'une borne $$B$$ et on calcule $$x$$ comme
 auparavant :
 
 $$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
