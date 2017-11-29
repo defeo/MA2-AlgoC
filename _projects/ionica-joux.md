@@ -72,7 +72,9 @@ Le projet est à développer en langage C, à l'aide de la bibliothèque
 - V. Vitse,
 [*Couplages sur courbes elliptiques définies sur des corps finis*](http://www-fourier.ujf-grenoble.fr/~viva/research/articles/thesis.pdf).
 - M. Fouquet.
-  [Anneau d'endomorphismes et cardinalité de courbes elliptiques : aspects algorithmiques](http://www.lix.polytechnique.fr/Labo/Mireille.Fouquet/Manuscrit.ps.gz)
+  [*Anneau d'endomorphismes et cardinalité de courbes elliptiques : aspects algorithmiques*](http://www.lix.polytechnique.fr/Labo/Mireille.Fouquet/Manuscrit.ps.gz)
+- L. De Feo. [*Mathematics of Isogeny Based
+  Cryptography*](https://arxiv.org/abs/1711.04062).
 - J. Silverman, *The arithmetic of elliptic curves*.
 - Blake, Seroussi, Smart, *Elliptic curves in cryptography*.
 - J.S. Milne,
