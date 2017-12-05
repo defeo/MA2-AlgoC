@@ -12,6 +12,63 @@ Notes de cours pour le cours *Algorithmique et programmation C* du
 1. TOC
 {:toc}
 
+## Passage d'arguments par la ligne de commande
+
+La majorité des programmes destinés à être exécutés dans le terminal
+acceptent des *arguments* à la suite du nom de la commande. Par
+exemple, le programme `gcc` s'attend à recevoir au moins le nom du
+fichier source à compiler :
+
+```
+gcc source.c
+```
+
+Encore un exemple, l'affichage commande `ls`, qui présente le contenu
+d'un dossier, peut être modifié par plusieurs *flags*:
+
+```
+ls -l -a --color
+```
+
+Les programmes écrit en C, ne sont pas une exception, et dans tout ce
+cours nous allons passer les entrées de nos programmes par la ligne de
+commande. Le mécanisme offert par le langage C passe par deux
+arguments spéciaux de la fonction `main`, tyipiquement nommés `argc`
+et `argv`. Voici un `main` avec signature complète:
+
+```c
+void main(int argc, char** argv) {
+    for (int i = 0; i < argc; i++) 
+	    printf("paramètre %d: %s\n", i, argv[i]);
+}
+```
+
+L'entier `argc` vaut le nombre d'arguments passés dans la ligne de
+commande, non de la commande incluse. `argv` est un tableau de chaînes
+de caractères à `argc` entrées, chaque entrée contenant l'argument
+correspondant sur la ligne de commande. Par exemple, le programme
+précédent, invoqué par
+
+```
+./a.out toto titi 1
+```
+
+affichera
+
+```
+paramètre 0: ./a.out
+paramètre 1: toto
+paramètre 2: titi
+paramètre 3: 1
+```
+
+### Exercices
+
+1. Écrire un programme qui prend sur la ligne de commande un entier
+   *n*, et qui affiche sur la sortie la valeur *n!* (factorielle de
+   *n*). **Suggestion:** la fonction `atol` de la `stdlib` permet de
+   convertir des chaînes de caractères en long.
+
 
 ## Compilation séparée, bibliothèques logicielles
 
