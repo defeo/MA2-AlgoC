@@ -567,7 +567,7 @@ que $$p-1$$ n'a que des petits facteurs.
 On suppose que tous les facteurs de $$p-1$$ sont plus petits qu'une
 borne $$B$$ et on calcule
 
-$$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
+$$x = \prod_{q \text{ premier } < B} q^{\lfloor\log_qp\rfloor}.$$
 
 Alors $$(p-1) \vert x$$ et $$a^x ≡ 1 \bmod p$$. Comme auparavant,
 $$p\vert\gcd(a^x - 1, N)$$, et si ce pgcd est différent de $$N$$ nous
@@ -626,7 +626,7 @@ coefficients dans $$ℤ/Nℤ$$. On suppose que tous les facteurs de
 $$p+1$$ sont plus petits qu'une borne $$B$$ et on calcule $$x$$ comme
 auparavant :
 
-$$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
+$$x = \prod_{q \text{ premier } < B} q^{\lfloor\log_qp\rfloor}.$$
 
 On choisit un point $$P$$ au hasard, en espérant qu'il s'agisse d'un
 point sur une conique avec $$\bigl(\frac{Δ}{p}\bigr)=-1$$ (cela a
@@ -992,7 +992,7 @@ groupes $$\mathbb{G}_m(𝔽_p),C(𝔽_p)$$ l'on substitue des courbes
 elliptiques tirées au hasard.  Comme dans les méthodes précédentes, on
 se fixe une borne $$B$$ et on calcule :
 
-$$x = \prod_{q \text{ prime } < B} q^{\lfloor\log_qp\rfloor}.$$
+$$x = \prod_{q \text{ premier } < B} q^{\lfloor\log_qp\rfloor}.$$
 
 On sélectionne une courbe $$E$$ au hasard, à coefficients modulo
 $$N$$, en espérant que la cardinalité de $$E(𝔽_p)$$ soit $$B$$-friable
