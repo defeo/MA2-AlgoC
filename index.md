@@ -19,14 +19,14 @@ acceptent des *arguments* à la suite du nom de la commande. Par
 exemple, le programme `gcc` s'attend à recevoir au moins le nom du
 fichier source à compiler :
 
-```
+```bash
 gcc source.c
 ```
 
 Encore un exemple, l'affichage commande `ls`, qui présente le contenu
 d'un dossier, peut être modifié par plusieurs *flags*:
 
-```
+```bash
 ls -l -a --color
 ```
 
@@ -49,13 +49,13 @@ de caractères à `argc` entrées, chaque entrée contenant l'argument
 correspondant sur la ligne de commande. Par exemple, le programme
 précédent, invoqué par
 
-```
+```bash
 ./a.out toto titi 1
 ```
 
 affichera
 
-```
+```text
 paramètre 0: ./a.out
 paramètre 1: toto
 paramètre 2: titi
@@ -89,14 +89,18 @@ chaque fichier source C (extension `.c`) correspond un fichier *objet*
 
 Pour produire les fichiers objets, on compile avec l'option `-c`
 
-	gcc -c A.c
-	gcc -c B.c
-	gcc -c C.c
-	...
+```bash
+gcc -c A.c
+gcc -c B.c
+gcc -c C.c
+...
+```
 
 ou, plus simplement,
 
-	gcc -c *.c
+```bash
+gcc -c *.c
+```
 
 Cela produit un fichier `.o` pour chaque fichier `.c`. Ces fichiers ne
 sont pas exécutables.
@@ -104,7 +108,9 @@ sont pas exécutables.
 Ensuite on *lie* tous les fichiers objets, et les bibliothèques
 éventuelles, dans un *exécutable*.
 
-	gcc -lm -o monprogramme.exe *.o
+```bash
+gcc -lm -o monprogramme.exe *.o
+```
 
 Cette étape s'appelle *linking* en anglais, et la partie du
 compilateur qui l'effectue s'appelle *linker*.
@@ -113,7 +119,9 @@ Lorsque tout le code est contenu dans un seul fichier, les étapes de
 compilation et d'exécution peuvent être exécutées d'un seul coup,
 comme déjà vu en cours.
 
-	gcc -lm -o hello hello.c
+```bash
+gcc -lm -o hello hello.c
+```
 
 **Note :** Lorsqu'on *linke* un programme exécutable, un et un seul
 des fichiers objets doit contenir une fonction nommée `main`. C'est
@@ -132,23 +140,24 @@ seul fichier, il est souvent nécessaire de commencer par déclarer les
 prototypes de toutes les fonctions qui seront définies, comme dans
 l'exemple suivant.
 
-	int f(int);
-	int g(int);
+```c
+int f(int);
+int g(int);
 
-	int f(int x) {
-		...
-	    return f(f(x));
-	}
+int f(int x) {
+	...
+    return f(f(x));
+}
 
-	int g(int y) {
-		...
-		return g(y);
-	}
+int g(int y) {
+	...
+	return g(y);
+}
 
-	void main() {
-		...
-	}
-
+void main() {
+	...
+}
+```
 
 La même chose vaut pour la compilation séparée. Une fonction `f()`
 dans un fichier `f.c`, avant de pouvoir appeler une fonction `g()`
@@ -166,45 +175,57 @@ préprocesseur : tout code ayant besoin de connaître les prototypes
 d'un certain groupe de fonctions inclut les entêtes correspondantes à
 l'aide de la macro
 
-	#include "entete.h"
+```c
+#include "entete.h"
+```
 
 Par exemple, l'exemple précédent pourrait être découpé comme suit.
 
 * Un fichier d'entête `my_module.h`, contenant tous les prototypes
   
-	  int f(int);
-	  int g(int);
+  ```
+  int f(int);
+  int g(int);
+  ```
 
 * Un fichier `f.c`, contenant la définition de `f()`
   
-	  #include "my_module.h"
+  ```c
+  #include "my_module.h"
 	  
-	  int f(int x) {
-		  ...
-	      return f(f(x));
-	  }
+  int f(int x) {
+	  ...
+      return f(f(x));
+  }
+  ```
 
 * Un fichier `g.c`, contenant la définition de `g()`
   
-	  #include "my_module.h"
+  ```c
+  #include "my_module.h"
 	  
-	  int g(int y) {
-		  ...
-		  return g(y);
-	  }
+  int g(int y) {
+	  ...
+	  return g(y);
+  }
+  ```
 
 * Un fichier `module.c` contenant le code du programme exécutable
   
-	  #include "my_module.h"
+  ```c
+  #include "my_module.h"
 	  
-	  void main() {
-		  ...
-	  }
-
+  void main() {
+	  ...
+  }
+  ```
+  
 Ces fichiers seraient alors compilés par la suite de commandes
 
-	gcc -c *.c
-	gcc -o my_module *.o
+```bash
+gcc -c *.c
+gcc -o my_module *.o
+```
 
 Remarquez que les commandes ne font pas mention des fichiers `.h`. En
 effet pendant la phase de compilation ces fichiers sont inclus
@@ -217,23 +238,27 @@ entêtes s'incluent mutuellement. Pour éviter les boucles d'inclusion
 infinies une technique souvent employée consiste à utiliser des
 *macros conditionnelles*. Considérez les deux fichiers suivants.
 
-	#ifndef entete1_h
-	#define entete1_h
+```c
+#ifndef entete1_h
+#define entete1_h
 
-	#include "entete2.h"
-	...
+#include "entete2.h"
+...
 
-	#endif
+#endif
+```
 
 <!-- -->
 
-	#ifndef entete2_h
-	#define entete2_h
+```
+#ifndef entete2_h
+#define entete2_h
 
-	#include "entete1.h"
-	...
-	
-	#endif
+#include "entete1.h"
+...
+
+#endif
+```
 
 Un fichier pourra inclure `entete1.h` et/ou `entete2.h`, sans que cela
 engendre d'erreur. Le manuel de gcc décrit cette astuce standard :
@@ -279,27 +304,35 @@ un intérêt exclusivement pour des petits projets personnels.
 La commande Unix utilisée pour créer une bibliothèque statique
 s'appelle `ar` et s'utilise ainsi
 
-	gcc -c *.c
-	ar rcs libmylib.a *.o
+```bash
+gcc -c *.c
+ar rcs libmylib.a *.o
+```
 
 Pour créer un objet `.so` sous Unix, il faut tout d'abord compiler les
 fichiers sources avec l'option `-fpic` (ou `-fPic`), et ensuite créer
 la bibliothèque avec `-shared`.
 
-	gcc -fpic -c *.c
-	gcc -shared -o libmylib.so *.o
+```bash
+gcc -fpic -c *.c
+gcc -shared -o libmylib.so *.o
+```
 
 Dans un cas comme dans l'autre, un exécutable peut linker la
 bibliothèque `libmylib.a` ou `libmylib.so` grâce à l'option `-l`
 (attention, l'ordre des options est important !)
 
-	gcc -o hello hello.o -lmylib
+```bash
+gcc -o hello hello.o -lmylib
+```
 
 **Note :** Si la bibliothèque a été crée dans le dossier courant, il
 faudra très probablement ajouter l'option `-L` pour indiquer au
 compilateur où trouver le fichier :
 
-	gcc -o hello hello.o -L. -lmylib
+```bash
+gcc -o hello hello.o -L. -lmylib
+```
 
 En plus, si la bibliothèque est dynamique, il faudra aussi instruire
 le *linker* de système, à travers la variable `LD_LIBRARY_PATH`. Voir
@@ -350,7 +383,9 @@ Sous Unix, gcc cherche les entêtes dans ces dossiers (entre autres) :
 
 En plus, les entêtes incluses avec
 
-	#include "entete.h"
+```c
+#include "entete.h"
+```
 
 sont aussi recherchées dans le même dossier que le fichier source qui
 demande l'inclusion. D'autres chemins peuvent être ajoutés avec
@@ -378,23 +413,25 @@ au système d'autres chemins où trouver les bibliothèques dynamiques.
 
 1. Considérez le code suivant
    
-	   int e(unsigned int x) {
-		   if (!x) return 1;
-		   else return o(x-1);
-	   }
-	   
-	   int o(unsigned int x) {
-		   if (!x) return 0;
-		   else return e(x-1);
-	   }
-	   
-	   void main(int argc) {
-		   printf("%d\n", e(argc));
-	   }
-
-	Complétez ce code et découpez-le d'au moins deux façons
-    différentes en plusieurs fichiers `.c` et `.h`. Vérifiez qu'il
-    compile et qu'il s'exécute sans erreurs.
+   ```c
+   int e(unsigned int x) {
+	   if (!x) return 1;
+	   else return o(x-1);
+   }
+  
+   int o(unsigned int x) {
+	   if (!x) return 0;
+	   else return e(x-1);
+   }
+  
+   void main(int argc) {
+	   printf("%d\n", e(argc));
+   }
+   ```
+   
+   Complétez ce code et découpez-le d'au moins deux façons
+   différentes en plusieurs fichiers `.c` et `.h`. Vérifiez qu'il
+   compile et qu'il s'exécute sans erreurs.
 	
 2. Si ce n'est pas déjà fait, découpez le code du point précédent en
    trois fichiers source avec une fonction par fichier. Créez une
@@ -452,13 +489,14 @@ par référence dans le(s) premier(s) argument(s) : la fonction
 
 Par exemple, pour le type `mpz_t`, on fera
 
-	mpz_t x;
-	mpz_init(x);
-	mpz_set_str(x, "12345", 10);  // met 12345 (lu en base 10) dans x
-	mpz_mul(x, x, x);
-	gmp_printf("%Zd\n", x);
-	mpz_clear(x);
-{:.c}
+```c
+mpz_t x;
+mpz_init(x);
+mpz_set_str(x, "12345", 10);  // met 12345 (lu en base 10) dans x
+mpz_mul(x, x, x);
+gmp_printf("%Zd\n", x);
+mpz_clear(x);
+```
 
 Les fonctions sur les entiers sont documentées ici :
 <https://gmplib.org/manual/Integer-Functions.html#Integer-Functions>. Ce
@@ -473,7 +511,9 @@ défaut par le système. Elle est déjà présente sur bourbaki, il suffit
 d'ajouter `-lgmp` à la phase de linkage. Pour installer GMP sur votre
 Ubuntu, utilisez la commande
 
-	sudo apt-get install libgmp3-dev
+```bash
+sudo apt-get install libgmp3-dev
+```
 
 1. La suite de Fibonacci est définie par une récurrence linéaire, qui
    peut être représentée sous forme matricielle par
@@ -499,27 +539,31 @@ On va maintenant installer GMP *from scratch*.
    <https://gmplib.org/#DOWNLOAD>, et décompressez-la avec la
    commande `tar xf`, par exemple:
    
-       tar xf gmp-6.x.x.tar.lz
+   ```bash
+   tar xf gmp-6.x.x.tar.lz
+   ```
 
 2. Lisez le fichier `INSTALL`. Il vous dit que GMP se compile et
    s'installe comme la majorité des bibliothèques GNU :
    
-	   ./configure
-	   make
-	   make install
-
-	Cependant, vous n'avez pas les droits de super-utilisateur sur
-    bourbaki, du coup vous ne pourrez pas faire `make install`. Pour
-    contourner ce problème, nous allons installer GMP dans notre
-    espace d'utilisateur : passez l'option `--prefix=$HOME` à
-    `./configure`, ensuite procédez comme décrit dans le fichier
-    `INSTALL`. Faites pareil même si vous travaillez sur votre propre
-    machine : on fera plus simple par la suite.
-
-	Lorsque vous aurez réussi, vous aurez un dossier `lib`, un dossier
-    `include` et un dossier `share` dans votre répertoire
-    utilisateur. Ils contiennent respectivement le code objet,
-    l'entête, et la documentation de GMP.
+   ```bash
+   ./configure
+   make
+   make install
+   ```
+   
+   Cependant, vous n'avez pas les droits de super-utilisateur sur
+   bourbaki, du coup vous ne pourrez pas faire `make install`. Pour
+   contourner ce problème, nous allons installer GMP dans notre espace
+   d'utilisateur : passez l'option `--prefix=$HOME` à `./configure`,
+   ensuite procédez comme décrit dans le fichier `INSTALL`. Faites
+   pareil même si vous travaillez sur votre propre machine : on fera
+   plus simple par la suite.
+   
+   Lorsque vous aurez réussi, vous aurez un dossier `lib`, un dossier
+   `include` et un dossier `share` dans votre répertoire
+   utilisateur. Ils contiennent respectivement le code objet,
+   l'entête, et la documentation de GMP.
 
 3. Recompiler le programme en le linkant contre cette version de la
    bibliothèque.
@@ -742,15 +786,19 @@ documentation à l'adresse
 compiler un programme avec du support pour le *profiling*, il faut
 ajouter l'option `-pg` à la compilation et aussi au linkage :
 
-	gcc -pg -c prog.c
-	gcc -pg prog.o -lm
+```bash
+gcc -pg -c prog.c
+gcc -pg prog.o -lm
+```
 
 Lorsque l'on exécute un programme compilé ainsi, un fichier `gmon.out`
 est généré à la sortie du programme. Ce fichier n'est pas dans un
 format lisible par un humain, il est transformé par le programme
 `gprof` :
 
-	gprof a.out gmon.out > profile.txt
+```bash
+gprof a.out gmon.out > profile.txt
+```
 
 Après cette commande, le fichier `profile.txt` contient deux parties :
 le *profil plat* et le *graphe d'appel*. Le profil plat (*flat
@@ -762,25 +810,27 @@ secondes le programme a passé dans la fonction sans compter les appels
 à d'autres sous-routines (*self seconds*), le nombre total d'appels et
 la durée moyenne par appel. Voici un exemple de profil plat
 
-	Flat profile:
+```text
+Flat profile:
 
-	Each sample counts as 0.01 seconds.
-	%   cumulative   self              self     total           
-	time   seconds   seconds    calls  ms/call  ms/call  name    
-	33.34      0.02     0.02     7208     0.00     0.00  open
-	16.67      0.03     0.01      244     0.04     0.12  offtime
-	16.67      0.04     0.01        8     1.25     1.25  memccpy
-	16.67      0.05     0.01        7     1.43     1.43  write
-	16.67      0.06     0.01                             mcount
-	 0.00      0.06     0.00      236     0.00     0.00  tzset
-	 0.00      0.06     0.00      192     0.00     0.00  tolower
-	 0.00      0.06     0.00       47     0.00     0.00  strlen
-	 0.00      0.06     0.00       45     0.00     0.00  strchr
-	 0.00      0.06     0.00        1     0.00    50.00  main
-	 0.00      0.06     0.00        1     0.00     0.00  memcpy
-	 0.00      0.06     0.00        1     0.00    10.11  print
-	 0.00      0.06     0.00        1     0.00     0.00  profil
-	 0.00      0.06     0.00        1     0.00    50.00  report
+Each sample counts as 0.01 seconds.
+%   cumulative   self              self     total           
+time   seconds   seconds    calls  ms/call  ms/call  name    
+33.34      0.02     0.02     7208     0.00     0.00  open
+16.67      0.03     0.01      244     0.04     0.12  offtime
+16.67      0.04     0.01        8     1.25     1.25  memccpy
+16.67      0.05     0.01        7     1.43     1.43  write
+16.67      0.06     0.01                             mcount
+ 0.00      0.06     0.00      236     0.00     0.00  tzset
+ 0.00      0.06     0.00      192     0.00     0.00  tolower
+ 0.00      0.06     0.00       47     0.00     0.00  strlen
+ 0.00      0.06     0.00       45     0.00     0.00  strchr
+ 0.00      0.06     0.00        1     0.00    50.00  main
+ 0.00      0.06     0.00        1     0.00     0.00  memcpy
+ 0.00      0.06     0.00        1     0.00    10.11  print
+ 0.00      0.06     0.00        1     0.00     0.00  profil
+ 0.00      0.06     0.00        1     0.00    50.00  report
+```
 
 Le graphe d'appel (*call graph*) contient pour chaque fonction la
 liste de toutes les sous-fonctions appelées par celle-ci, le temps
@@ -795,16 +845,18 @@ a fait tous les 125 appels à `__gmpz_mul`, les 99 appels à
 numéros entre crochets sont des références numériques pour les nœuds
 du graphe.
 
-	-----------------------------------------------
-					0.00    0.00       1/1           main [4]
-	[41]     0.1    0.00    0.00       1         fibonacci [41]
-					0.00    0.00     125/125         __gmpz_mul [42]
-					0.00    0.00      99/99          __gmpz_add [435]
-					0.00    0.00      24/24          __gmpz_sub [443]
-					0.00    0.00       4/4           __gmpz_init_set_ui [448]
-					0.00    0.00       2/3           __gmpz_init [449]
-					0.00    0.00       1/1           __gmpz_set [453]
-	-----------------------------------------------
+```text
+-----------------------------------------------
+				0.00    0.00       1/1           main [4]
+[41]     0.1    0.00    0.00       1         fibonacci [41]
+				0.00    0.00     125/125         __gmpz_mul [42]
+				0.00    0.00      99/99          __gmpz_add [435]
+				0.00    0.00      24/24          __gmpz_sub [443]
+				0.00    0.00       4/4           __gmpz_init_set_ui [448]
+				0.00    0.00       2/3           __gmpz_init [449]
+				0.00    0.00       1/1           __gmpz_set [453]
+-----------------------------------------------
+```
 
 Il existe un programme permettant de transformer ce format textuel en
 une visualisation graphique, il s'agit de
@@ -828,10 +880,12 @@ Pour compiler GMP avec le support pour le profiling, il faut passer
 une option au script de configuration, et ensuite recompiler la
 bibliothèque
 
-	./configure --prefix=$HOME --enable-profiling=gprof
-	make clean
-	make
-	make install
+```bash
+./configure --prefix=$HOME --enable-profiling=gprof
+make clean
+make
+make install
+```
 
 Ensuite, pour *linker* statiquement les bibliothèques au moment de la
 compilation, il faut passer l'option `-static` au *linker*. Il ne
@@ -839,8 +893,9 @@ faudra pas oublier d'adresser la compilation et le *linkage* vers les
 bonnes versions de la bibliothèque à l'aide des options `-I` et `-L`
 (voir [plus haut](#les-chemins-de-recherche)).
 
-	gcc -I$HOME/include -L$HOME/lib  -pg -static prog.c -lgmp
-
+```
+gcc -I$HOME/include -L$HOME/lib  -pg -static prog.c -lgmp
+```
 
 ### Exercices
 
@@ -974,18 +1029,19 @@ partir de l'abscisse de $$P$$. Pendant tout l'algorithme, on garde en
 mémoire une paire de points $$A$$ et $$B$$, dont la différence est
 $$P$$, et on procède de façon similaire à un *double-and-add*.
 
-	A = 0
-	B = P
-	D = P
-	pour tout bit b de k en partant de la gauche
-		si b == 0
-			A = Double(A)
-			B = DiffAdd(A, B, P)
-		sinon
-			A = DiffAdd(A, B, P)
-			B = Double(B)
-	renvoyer A
-
+```text
+A = 0
+B = P
+D = P
+pour tout bit b de k en partant de la gauche
+	si b == 0
+		A = Double(A)
+		B = DiffAdd(A, B, P)
+	sinon
+		A = DiffAdd(A, B, P)
+		B = Double(B)
+renvoyer A
+```
 
 ### La méthode de factorisation ECM
 
