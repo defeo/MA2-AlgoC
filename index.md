@@ -250,7 +250,7 @@ infinies une technique souvent employée consiste à utiliser des
 
 <!-- -->
 
-```
+```c
 #ifndef entete2_h
 #define entete2_h
 
