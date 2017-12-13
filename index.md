@@ -497,7 +497,9 @@ On va maintenant installer GMP *from scratch*.
 
 1. Téléchargez la dernière version de GMP ici :
    <https://gmplib.org/#DOWNLOAD>, et décompressez-la avec la
-   commande `tar xf`.
+   commande `tar xf`, par exemple:
+   
+       tar xf gmp-6.x.x.tar.lz
 
 2. Lisez le fichier `INSTALL`. Il vous dit que GMP se compile et
    s'installe comme la majorité des bibliothèques GNU :
