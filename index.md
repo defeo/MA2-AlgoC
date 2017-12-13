@@ -893,7 +893,7 @@ faudra pas oublier d'adresser la compilation et le *linkage* vers les
 bonnes versions de la bibliothèque à l'aide des options `-I` et `-L`
 (voir [plus haut](#les-chemins-de-recherche)).
 
-```
+```bash
 gcc -I$HOME/include -L$HOME/lib  -pg -static prog.c -lgmp
 ```
 
