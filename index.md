@@ -44,7 +44,7 @@ void main(int argc, char** argv) {
 ```
 
 L'entier `argc` vaut le nombre d'arguments passés dans la ligne de
-commande, non de la commande incluse. `argv` est un tableau de chaînes
+commande, nom de la commande incluse. `argv` est un tableau de chaînes
 de caractères à `argc` entrées, chaque entrée contenant l'argument
 correspondant sur la ligne de commande. Par exemple, le programme
 précédent, invoqué par
@@ -507,9 +507,9 @@ cours.
 ### Exercices
 
 Pour commencer, nous allons utiliser la version de GMP installée par
-défaut par le système. Elle est déjà présente sur bourbaki, il suffit
-d'ajouter `-lgmp` à la phase de linkage. Pour installer GMP sur votre
-Ubuntu, utilisez la commande
+défaut par le système. Elle est déjà présente sur le cloud de
+l'université, il suffit d'ajouter `-lgmp` à la phase de linkage. Pour
+installer GMP sur votre Ubuntu, utilisez la commande
 
 ```bash
 sudo apt-get install libgmp3-dev
@@ -552,13 +552,13 @@ On va maintenant installer GMP *from scratch*.
    make install
    ```
    
-   Cependant, vous n'avez pas les droits de super-utilisateur sur
-   bourbaki, du coup vous ne pourrez pas faire `make install`. Pour
-   contourner ce problème, nous allons installer GMP dans notre espace
-   d'utilisateur : passez l'option `--prefix=$HOME` à `./configure`,
-   ensuite procédez comme décrit dans le fichier `INSTALL`. Faites
-   pareil même si vous travaillez sur votre propre machine : on fera
-   plus simple par la suite.
+   Cependant, vous n'avez pas les droits de super-utilisateur dans
+   votre serveur virtuel, du coup vous ne pourrez pas faire
+   `make install`. Pour contourner ce problème, nous allons installer
+   GMP dans notre espace d'utilisateur : passez l'option
+   `--prefix=$HOME` à `./configure`, ensuite procédez comme décrit
+   dans le fichier `INSTALL`. Faites pareil même si vous travaillez
+   sur votre propre machine : on fera plus simple par la suite.
    
    Lorsque vous aurez réussi, vous aurez un dossier `lib`, un dossier
    `include` et un dossier `share` dans votre répertoire
