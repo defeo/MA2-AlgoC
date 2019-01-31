@@ -75,6 +75,9 @@ Le projet est à développer en langage C, à l'aide de la bibliothèque
   [*Anneau d'endomorphismes et cardinalité de courbes elliptiques : aspects algorithmiques*](http://www.lix.polytechnique.fr/Labo/Mireille.Fouquet/Manuscrit.ps.gz)
 - L. De Feo. [*Mathematics of Isogeny Based
   Cryptography*](https://arxiv.org/abs/1711.04062).
+- L. De Feo, C. Hugounenq, J. Plût, É. Schost.  [*Explicit isogenies
+  in quadratic time in any
+  characteristic*](https://arxiv.org/abs/1603.00711v1).
 - J. Silverman, *The arithmetic of elliptic curves*.
 - Blake, Seroussi, Smart, *Elliptic curves in cryptography*.
 - J.S. Milne,

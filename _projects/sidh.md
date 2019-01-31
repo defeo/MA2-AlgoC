@@ -71,6 +71,9 @@ Connaissances en courbes elliptiques.
 
 # Références
 
+- D. Jao et al. [*Supersingular Isogeny Key
+  Encapsulation*](https://sike.org/files/SIDH-spec.pdf). NIST PQ
+  Candidate. <https://sike.org/>.
 - L. De Feo, D. Jao, J. Plût. [*Towards Quantum-Resistant
   Cryptosystems From Supersingular Elliptic Curve
   Isogenies*](https://eprint.iacr.org/2011/506.pdf).
